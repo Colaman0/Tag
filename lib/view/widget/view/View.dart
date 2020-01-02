@@ -22,13 +22,19 @@ class View extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    EdgeInsets temp = _margin?.getParams() ?? _defalut;
+    _margin = CustomMP();
     return Material(
-      child: Ink(
-        decoration: getBoxDecoration(),
-        child: InkWell(
-          onTap: _onTap,
-          onDoubleTap: onDoubleTap,
-          child: buildChild(),
+      color: Colors.transparent,
+      child: Container(
+        margin: temp,
+        child: Ink(
+          decoration: getBoxDecoration(),
+          child: InkWell(
+            onTap: _onTap,
+            onDoubleTap: onDoubleTap,
+            child: buildChild(),
+          ),
         ),
       ),
     );
@@ -117,39 +123,39 @@ class View extends StatelessWidget {
             child: initChild());
       } else {
         body = Container(
-            padding: _padding?.getParams() ?? _defalut,
-            margin: _margin?.getParams() ?? _defalut,
-            height: DP.get(_height),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[initChild()],
-            ),
-           );
+          padding: _padding?.getParams() ?? _defalut,
+          margin: _margin?.getParams() ?? _defalut,
+          height: DP.get(_height),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[initChild()],
+          ),
+        );
       }
     } else if (isDpValue(_width) && !isDpValue(_height)) {
       if (_height == View.MATCH) {
         body = Container(
-            padding: _padding?.getParams() ?? _defalut,
-            margin: _margin?.getParams() ?? _defalut,
-            alignment: Alignment.center,
-            height: double.infinity,
-            width: DP.get(_width),
-            child: initChild(),
-           );
+          padding: _padding?.getParams() ?? _defalut,
+          margin: _margin?.getParams() ?? _defalut,
+          alignment: Alignment.center,
+          height: double.infinity,
+          width: DP.get(_width),
+          child: initChild(),
+        );
       } else {
         body = Container(
-            padding: _padding?.getParams() ?? _defalut,
-            margin: _margin?.getParams() ?? _defalut,
-            width: DP.get(_width),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[initChild()],
-            ),
-         );
+          padding: _padding?.getParams() ?? _defalut,
+          margin: _margin?.getParams() ?? _defalut,
+          width: DP.get(_width),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[initChild()],
+          ),
+        );
       }
     }
     return body;
@@ -159,17 +165,20 @@ class View extends StatelessWidget {
     return child ?? Text("");
   }
 
-  Widget expandCheck(Widget child) => (child is Column || child is Row) ? Expanded(child: child) : child;
+  Widget expandCheck(Widget child) =>
+      (child is Column || child is Row) ? Expanded(child: child) : child;
 
   bool isDpValue(int value) => value >= 0;
 
   View padding({int both, int left, int right, int top, int bottom}) {
-    _padding = CustomMP(both: both, left: left, right: right, top: top, bottom: bottom);
+    _padding = CustomMP(
+        both: both, left: left, right: right, top: top, bottom: bottom);
     return this;
   }
 
   View margin({int both, int left, int right, int top, int bottom}) {
-    _margin = CustomMP(both: both, left: left, right: right, top: top, bottom: bottom);
+    _margin = CustomMP(
+        both: both, left: left, right: right, top: top, bottom: bottom);
     return this;
   }
 
@@ -194,7 +203,8 @@ class View extends StatelessWidget {
     return this;
   }
 
-  View corner({int both, int leftTop, int leftBottom, int rightTop, int rightBottom}) {
+  View corner(
+      {int both, int leftTop, int leftBottom, int rightTop, int rightBottom}) {
     _bothRadius = both;
     _leftTop = leftTop;
     _leftBottom = leftBottom;
@@ -233,10 +243,14 @@ class View extends StatelessWidget {
     }
     var bothRadius = DP.get(_bothRadius);
     return BorderRadius.only(
-      topLeft: Radius.circular(_leftTop == null ? bothRadius : DP.get(_leftTop)),
-      topRight: Radius.circular(_rightTop == null ? bothRadius : DP.get(_rightTop)),
-      bottomLeft: Radius.circular(_leftBottom == null ? bothRadius : DP.get(_leftBottom)),
-      bottomRight: Radius.circular(_rightBottom == null ? bothRadius : DP.get(_rightBottom)),
+      topLeft:
+          Radius.circular(_leftTop == null ? bothRadius : DP.get(_leftTop)),
+      topRight:
+          Radius.circular(_rightTop == null ? bothRadius : DP.get(_rightTop)),
+      bottomLeft: Radius.circular(
+          _leftBottom == null ? bothRadius : DP.get(_leftBottom)),
+      bottomRight: Radius.circular(
+          _rightBottom == null ? bothRadius : DP.get(_rightBottom)),
     );
   }
 

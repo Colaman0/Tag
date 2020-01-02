@@ -26,27 +26,23 @@ class _CustomDialogState extends State<CustomDialog> {
     RoundedRectangleBorder _defaultDialogShape = RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(2.0)));
 
-    return AnimatedPadding(
-      padding: MediaQuery.of(context).viewInsets +
-          const EdgeInsets.symmetric(horizontal: 40.0, vertical: 24.0),
-      duration: insetAnimationDuration,
-      curve: insetAnimationCurve,
-      child: MediaQuery.removeViewInsets(
-        removeLeft: true,
-        removeTop: true,
-        removeRight: true,
-        removeBottom: true,
-        context: context,
-        child: View(
-          child: Center(
-            child: Material(
-              color: Colors.black,
-              type: MaterialType.card,
-              //在这里修改成我们想要显示的widget就行了，外部的属性跟其他Dialog保持一致
-              child: childWidget,
-            ),
-          ),
-        ).size(width: View.MATCH, height: View.MATCH),
+    return IntrinsicWidth(
+
+      child: AnimatedPadding(
+        padding: MediaQuery.of(context).viewInsets +
+            const EdgeInsets.symmetric(horizontal: 40.0, vertical: 24.0),
+        duration: insetAnimationDuration,
+        curve: insetAnimationCurve,
+        child: MediaQuery.removeViewInsets(
+          removeLeft: true,
+          removeTop: true,
+          removeRight: true,
+          removeBottom: true,
+          context: context,
+          child: View(
+
+          ).size(width: 50,height: 50).backgroundColor(Colors.transparent),
+        ),
       ),
     );
   }
