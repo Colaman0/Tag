@@ -12,7 +12,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData(accentColor: HexColor(Constants.MAIN_COLOR)),
       initialRoute: '/',
       routes: NavigatorUtils.routeMap,
     );
