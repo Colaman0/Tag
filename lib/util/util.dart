@@ -20,6 +20,10 @@ class DP {
     }
     return ScreenUtil.getInstance().setWidth(dp.toDouble());
   }
+
+  static int toPx(double size) {
+    return (size / ScreenUtil.getPixelRatio()).toInt();
+  }
 }
 
 class SP {
