@@ -7,6 +7,7 @@ import 'package:rxdart/rxdart.dart';
 import 'package:tag/entity/Constants.dart';
 import 'package:tag/util/util.dart';
 import 'package:tag/view/widget/BuildLineWidget.dart';
+import 'package:tag/view/widget/CalendarWidget.dart';
 import 'package:tag/view/widget/Toast.dart';
 import 'package:tag/view/widget/view/TextView.dart';
 import 'package:tag/view/widget/view/View.dart';
@@ -20,15 +21,16 @@ class BuildFlagRoute extends StatelessWidget {
   List<Widget> pages = List();
 
   BuildFlagRoute({Key key}) : super(key: key) {
-    buildProgressWidget = BuildLineWidget(<Widget>[TextView("日期"), TextView("背景图"), TextView("里程碑")], pageStream);
+    buildProgressWidget = BuildLineWidget(
+        <Widget>[TextView("日期"), TextView("背景图"), TextView("里程碑")], pageStream);
   }
 
   bool _dataVaild = false;
 
   @override
   Widget build(BuildContext context) {
+    pages.add(CalendarWidget());
     pages.add(selectBg());
-    pages.add(getFlagContentInput());
     pages.add(getFlagContentInput());
 
     return SafeArea(
@@ -39,7 +41,10 @@ class BuildFlagRoute extends StatelessWidget {
                 "预览",
                 textColor: Colors.white,
                 textSize: 20,
-              ).padding(left: 16, right: 16).size(height: View.MATCH).click(() {})
+              )
+                  .padding(left: 16, right: 16)
+                  .size(height: View.MATCH)
+                  .click(() {})
             ],
             centerTitle: true,
             title: Text("新建Flag"),
@@ -82,12 +87,14 @@ class BuildFlagRoute extends StatelessWidget {
                 textColor: Colors.black,
                 disabledTextColor: Colors.grey,
                 child: Text("上一步"),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(30))),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(30))),
                 onPressed: page == 0
                     ? null
                     : () {
                         _controller.animateToPage(--page,
-                            duration: Duration(milliseconds: 100), curve: Curves.bounceIn);
+                            duration: Duration(milliseconds: 100),
+                            curve: Curves.bounceIn);
                       },
               ),
               MaterialButton(
@@ -97,13 +104,15 @@ class BuildFlagRoute extends StatelessWidget {
                 disabledTextColor: Colors.white,
                 disabledColor: HexColor(Constants.COLOR_3),
                 child: Text("下一步"),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(30))),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(30))),
                 onPressed: page == pages.length - 1
                     ? null
                     : () {
                         if (_dataVaild) {
                           _controller.animateToPage(++page,
-                              duration: Duration(milliseconds: 100), curve: Curves.bounceIn);
+                              duration: Duration(milliseconds: 100),
+                              curve: Curves.bounceIn);
                           _dataVaild = false;
                         } else {
                           Toast.toast(context, msg: "请填写对应数据");
@@ -139,7 +148,9 @@ class BuildFlagRoute extends StatelessWidget {
                           Positioned(
                             right: 0,
                             top: 0,
-                            child: View(child: Icon(Icons.clear, size: 16, color: Colors.white))
+                            child: View(
+                                    child: Icon(Icons.clear,
+                                        size: 16, color: Colors.white))
                                 .padding(both: 8)
                                 .corner(both: 5)
                                 .backgroundColor(Colors.white70)
@@ -176,7 +187,11 @@ class BuildFlagRoute extends StatelessWidget {
           hintText: "请输入Flag标题",
         ),
       ),
-    ).margin(left: 16, right: 16).padding(both: 8).corner(both: 5).storke(color: Constants.MAIN_COLOR, width: 1);
+    )
+        .margin(left: 16, right: 16)
+        .padding(both: 8)
+        .corner(both: 5)
+        .storke(color: Constants.MAIN_COLOR, width: 1);
   }
 
   Widget getFlagContentInput() {
@@ -191,6 +206,10 @@ class BuildFlagRoute extends StatelessWidget {
           hintText: "请输入Flag内容",
         ),
       ),
-    ).margin(left: 16, right: 16).padding(both: 8).corner(both: 5).storke(color: Constants.MAIN_COLOR, width: 1);
+    )
+        .margin(left: 16, right: 16)
+        .padding(both: 8)
+        .corner(both: 5)
+        .storke(color: Constants.MAIN_COLOR, width: 1);
   }
 }
