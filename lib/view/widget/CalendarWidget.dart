@@ -55,28 +55,52 @@ class _MonthPageState extends State<MonthPage>
 
   DateTime currentMonth;
 
-
-  _MonthPageState(this.nowDateTime, this.index) {
+  _MonthPageState(
+    this.index,
+    this.nowDateTime,
+  ) {
     int year = nowDateTime.year;
-    int tagYear = CalendarWidget.startIndex - index;
+    int different = CalendarWidget.startIndex - index;
 
-    while(tagYear >=12) {
-      tagYear-=12;
-      year--;
-    }
-    if(index - CalendarWidget.startIndex >0 ) {
-      currentMonth = nowDateTime.add(Duration(days: DateUtil.getMonthDaysCount(nowDateTime.year, nowDateTime.month)));
-    }else{
-      currentMonth = nowDateTime.subtract(Duration(days: DateUtil.getMonthDaysCount(nowDateTime.year, nowDateTime.month)));
-    }
+    // 算出差了多少年
+    int yearDifferent = different ~/ 12;
+    // 算出月份差距
+    int monthDifferent = different % 12;
+
+    // 根据年月的差值算出当前page是代表哪一年哪个月份
+    currentMonth =
+        DateTime(year - yearDifferent, nowDateTime.month - monthDifferent);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: TextView(index.toString()),
-    );
+    return StreamBuilder<DateTime>(builder: (context, data) {
+      List<Widget> widgets =
+          List.of([Row(children: getWeekTitles()), Divider()]);
+      widgets.addAll(getDateItem());
+      return Column(
+        children: widgets,
+      );
+    });
   }
+
+  List<Widget> getDateItem() {
+    List<Widget> widgets = List();
+    for(int i = 0;i<7;i++) {
+      DateUtil.getIndexOfFirstDayInMonth(currentMonth);
+    }
+    return widgets;
+  }
+
+  List<Widget> getWeekTitles() => [
+        Expanded(child: TextView("一")),
+        Expanded(child: TextView("二")),
+        Expanded(child: TextView("三")),
+        Expanded(child: TextView("四")),
+        Expanded(child: TextView("五")),
+        Expanded(child: TextView("六")),
+        Expanded(child: TextView("日")),
+      ];
 
   @override
   bool get wantKeepAlive => true;
@@ -87,16 +111,16 @@ class _MonthPageState extends State<MonthPage>
  */
 class DateUtil {
   /**
-   * 判断一个日期是否是周末，即周六日
-   */
+     * 判断一个日期是否是周末，即周六日
+     */
   static bool isWeekend(DateTime dateTime) {
     return dateTime.weekday == DateTime.saturday ||
         dateTime.weekday == DateTime.sunday;
   }
 
   /**
-   * 获取某年的天数
-   */
+     * 获取某年的天数
+     */
   static int getYearDaysCount(int year) {
     if (isLeapYear(year)) {
       return 366;
@@ -105,12 +129,12 @@ class DateUtil {
   }
 
   /**
-   * 获取某月的天数
-   *
-   * @param year  年
-   * @param month 月
-   * @return 某月的天数
-   */
+     * 获取某月的天数
+     *
+     * @param year  年
+     * @param month 月
+     * @return 某月的天数
+     */
   static int getMonthDaysCount(int year, int month) {
     int count = 0;
     //判断大月份
@@ -141,23 +165,23 @@ class DateUtil {
   }
 
   /**
-   * 是否是今天
-   */
+     * 是否是今天
+     */
   static bool isCurrentDay(int year, int month, int day) {
     DateTime now = DateTime.now();
     return now.year == year && now.month == month && now.day == day;
   }
 
   /**
-   * 是否是闰年
-   */
+     * 是否是闰年
+     */
   static bool isLeapYear(int year) {
     return ((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0);
   }
 
   /**
-   * 本月的第几周
-   */
+     * 本月的第几周
+     */
   static int getIndexWeekInMonth(DateTime dateTime) {
     DateTime firstdayInMonth = new DateTime(dateTime.year, dateTime.month, 1);
     Duration duration = dateTime.difference(firstdayInMonth);
@@ -165,8 +189,8 @@ class DateUtil {
   }
 
   /**
-   * 本周的第几天
-   */
+     * 本周的第几天
+     */
   static int getIndexDayInWeek(DateTime dateTime) {
     DateTime firstdayInMonth = new DateTime(
       dateTime.year,
@@ -177,9 +201,9 @@ class DateUtil {
   }
 
   /**
-   * 本月第一天，是那一周的第几天,从1开始
-   * @return 获取日期所在月视图对应的起始偏移量 the start diff with MonthView
-   */
+     * 本月第一天，是那一周的第几天,从1开始
+     * @return 获取日期所在月视图对应的起始偏移量 the start diff with MonthView
+     */
   static int getIndexOfFirstDayInMonth(DateTime dateTime) {
     DateTime firstDayOfMonth = new DateTime(dateTime.year, dateTime.month, 1);
 
@@ -191,8 +215,8 @@ class DateUtil {
   static List<DateModel> initCalendarForMonthView(
       int year, int month, DateTime currentDate, int weekStart,
       {DateModel minSelectDate,
-        DateModel maxSelectDate,
-        Map<DateModel, Object> extraDataMap}) {
+      DateModel maxSelectDate,
+      Map<DateModel, Object> extraDataMap}) {
     print('initCalendarForMonthView start');
     weekStart = DateTime.monday;
     //获取月视图其实偏移量
@@ -240,11 +264,11 @@ class DateUtil {
       if (extraDataMap?.isNotEmpty == true) {
         if (extraDataMap.containsKey(dateModel)) {
           dateModel.extraData = extraDataMap[dateModel];
-        }else{
-          dateModel.extraData=null;
+        } else {
+          dateModel.extraData = null;
         }
-      }else{
-        dateModel.extraData=null;
+      } else {
+        dateModel.extraData = null;
       }
 
       result.add(dateModel);
@@ -256,8 +280,8 @@ class DateUtil {
   }
 
   /**
-   * 月的行数
-   */
+     * 月的行数
+     */
   static int getMonthViewLineCount(int year, int month) {
     DateTime firstDayOfMonth = new DateTime(year, month, 1);
     int monthDayCount = getMonthDaysCount(year, month);
@@ -270,13 +294,13 @@ class DateUtil {
   }
 
   /**
-   * 获取本周的7个item
-   */
+     * 获取本周的7个item
+     */
   static List<DateModel> initCalendarForWeekView(
       int year, int month, DateTime currentDate, int weekStart,
       {DateModel minSelectDate,
-        DateModel maxSelectDate,
-        Map<DateModel, Object> extraDataMap}) {
+      DateModel maxSelectDate,
+      Map<DateModel, Object> extraDataMap}) {
     List<DateModel> items = List();
 
     int weekDay = currentDate.weekday;
@@ -286,7 +310,7 @@ class DateUtil {
 
     for (int i = 1; i <= 7; i++) {
       DateModel dateModel =
-      DateModel.fromDateTime(firstDayOfWeek.add(Duration(days: i)));
+          DateModel.fromDateTime(firstDayOfWeek.add(Duration(days: i)));
 
       //判断是否在范围内
       if (dateModel.getDateTime().isAfter(minSelectDate.getDateTime()) &&

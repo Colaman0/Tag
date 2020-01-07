@@ -17,7 +17,7 @@ class View extends StatelessWidget {
   Function _onTap, onDoubleTap;
   bool _touchAnimation = true;
   Widget child;
-  Alignment childAlignment;
+  Alignment childAlignment = Alignment.center;
 
   View({Key key, this.child}) : super(key: key);
 
