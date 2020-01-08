@@ -22,8 +22,11 @@ class BuildLineWidget extends StatelessWidget {
       return Container(
         child: Column(
           children: <Widget>[
-            Row(
-              children: titles,
+            Container(
+              margin: EdgeInsets.only(top: DP.get(4),bottom: DP.get(8)),
+              child: Row(
+                children: titles,
+              ),
             ),
             StreamBuilder(
               initialData: 0,
@@ -64,9 +67,12 @@ class BuildLineWidget extends StatelessWidget {
     );
   }
 
-  Color getPointColor(int position) => position <= _currentProgress ? HexColor("eb4d55") : HexColor(Constants.COLOR_3);
+  String color = Constants.COLOR_BLUE;
 
-  Color getLineColor(int position) => position <= _currentProgress ? HexColor("eb4d55") : HexColor(Constants.COLOR_3);
+
+  Color getPointColor(int position) => position <= _currentProgress ? HexColor(color) : HexColor(Constants.COLOR_3);
+
+  Color getLineColor(int position) => position <= _currentProgress ? HexColor(color) : HexColor(Constants.COLOR_3);
 
   int _currentProgress = 0;
 

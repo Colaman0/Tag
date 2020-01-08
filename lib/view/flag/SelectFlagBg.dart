@@ -4,12 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:tag/entity/Constants.dart';
+import 'package:tag/imp/basePage.dart';
 import 'package:tag/util/util.dart';
 import 'package:tag/view/widget/view/View.dart';
 
 import '../BaseBuildPage.dart';
 
-class SelectFlagBg extends StatelessWidget with BaseBuildPage {
+class SelectFlagBg extends StatelessWidget with BasePage {
   File _file;
 
   @override
@@ -64,5 +65,11 @@ class SelectFlagBg extends StatelessWidget with BaseBuildPage {
   }
 
   @override
-  bool dataVaild() => _file != null;
+  bool dataVaild() => true;
+
+  @override
+  String dataTips() {
+    // TODO: implement dataTips
+    return "";
+  }
 }
