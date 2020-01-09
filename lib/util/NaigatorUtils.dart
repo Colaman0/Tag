@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:tag/route/BuildFlagRoute.dart';
+import 'package:tag/route/BuildTagRoute.dart';
 import 'package:tag/route/LoginRoute.dart';
 import 'package:tag/route/SplashRoute.dart';
 import 'package:tag/route/main/MainPage.dart';
@@ -19,6 +20,7 @@ class NavigatorUtils {
     "/login": (BuildContext context) => LoginRoute(),
     "/main": (BuildContext context) => MainPage(),
     "/buildFlag": (BuildContext context) => BuildFlagRoute(),
+    "/buildTag": (BuildContext context) => BuildTagRoute(),
   };
 
   NavigatorUtils._();
@@ -48,5 +50,9 @@ class NavigatorUtils {
 
   void toBuildFlag(BuildContext context) {
     Navigator.of(context).pushNamed("/buildFlag");
+  }
+
+  void toBuildTag(BuildContext context) {
+    Navigator.of(context).pushNamed("/buildTag");
   }
 }

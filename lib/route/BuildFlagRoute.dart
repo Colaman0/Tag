@@ -41,6 +41,7 @@ class BuildFlagRoute extends StatelessWidget {
     return SafeArea(
       child: Scaffold(
           appBar: AppBar(
+
             actions: <Widget>[
               TextView(
                 "预览",
@@ -53,7 +54,7 @@ class BuildFlagRoute extends StatelessWidget {
             ],
             centerTitle: true,
             title: Text("新建Flag"),
-            backgroundColor: HexColor(Constants.MAIN_COLOR),
+            backgroundColor: Colors.transparent,
           ),
           body: Center(
             child: Column(

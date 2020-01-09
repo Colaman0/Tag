@@ -7,11 +7,11 @@ import 'package:tag/util/NaigatorUtils.dart';
 import 'package:tag/util/util.dart';
 
 void main() {
-  debugPaintSizeEnabled =!true;
+  debugPaintSizeEnabled = !true;
   runApp(MyApp());
 
-  FlutterStatusbarcolor.setStatusBarColor(HexColor(Constants.MAIN_COLOR));
-  FlutterStatusbarcolor.setStatusBarWhiteForeground(true);
+
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(statusBarColor:Colors.transparent));
 }
 
 class MyApp extends StatelessWidget {

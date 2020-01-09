@@ -103,7 +103,7 @@ class CalendarWidget extends StatelessWidget with BasePage {
                           width: double.infinity,
                           height: 1,
                         ),
-                        Divider(color: Colors.black),
+                        Divider(color: Colors.grey),
                         AspectRatio(
                           aspectRatio: 1,
                           child: pageView,
@@ -123,8 +123,7 @@ class CalendarWidget extends StatelessWidget with BasePage {
       itemCount: CAN_WATCH_YEAR * 12 * 2,
       onPageChanged: (pageIndex) {
         _lastPageIndex = pageIndex;
-        _bloc
-            .getcurrentShowMonthTimeStream()
+        _bloc.getcurrentShowMonthTimeStream()
             .add(monthPages[pageIndex].getCurrentMonthTime());
       },
       itemBuilder: (context, index) {
@@ -256,6 +255,8 @@ class DateItem extends StatefulWidget {
 class _DateItemState extends State<DateItem> {
   final DateTime itemTime;
   final String _weekendColors = Constants.COLOR_BLUE;
+  final Color itemSelectTextColor = Colors.white;
+  final Color itemNormalTextColor = HexColor(Constants.MAIN_COLOR);
 
   CalendarBloc _bloc;
   Widget _child;
@@ -297,14 +298,11 @@ class _DateItemState extends State<DateItem> {
               aspectRatio: 1,
               child: Container(
                 child: View(
-                  child: TextView(
-                    "${itemTime.day}",
-                    textColor: DateUtil.isWeekend(itemTime)
-                        ? HexColor(Constants.MAIN_COLOR)
-                        : Colors.white,
-                    textSize: 26,
-                  ),
-                )
+                        child: TextView(
+                  "${itemTime.day}",
+                  textColor: Colors.white,
+                  textSize: 26,
+                ))
                     .circle()
                     .backgroundColorStr(Constants.MAIN_COLOR)
                     .click(() {}),
@@ -322,16 +320,16 @@ class _DateItemState extends State<DateItem> {
  */
 class DateUtil {
   /**
-   * 判断一个日期是否是周末，即周六日
-   */
+     * 判断一个日期是否是周末，即周六日
+     */
   static bool isWeekend(DateTime dateTime) {
     return dateTime.weekday == DateTime.saturday ||
         dateTime.weekday == DateTime.sunday;
   }
 
   /**
-   * 获取某年的天数
-   */
+     * 获取某年的天数
+     */
   static int getYearDaysCount(int year) {
     if (isLeapYear(year)) {
       return 366;
@@ -340,12 +338,12 @@ class DateUtil {
   }
 
   /**
-   * 获取某月的天数
-   *
-   * @param year  年
-   * @param month 月
-   * @return 某月的天数
-   */
+     * 获取某月的天数
+     *
+     * @param year  年
+     * @param month 月
+     * @return 某月的天数
+     */
   static int getMonthDaysCount(int year, int month) {
     int count = 0;
     //判断大月份
@@ -376,8 +374,8 @@ class DateUtil {
   }
 
   /**
-   * 是否是今天
-   */
+     * 是否是今天
+     */
   static bool isCurrentDay(int year, int month, int day) {
     DateTime now = DateTime.now();
     return now.year == year && now.month == month && now.day == day;
@@ -390,15 +388,15 @@ class DateUtil {
   }
 
   /**
-   * 是否是闰年
-   */
+     * 是否是闰年
+     */
   static bool isLeapYear(int year) {
     return ((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0);
   }
 
   /**
-   * 本月的第几周
-   */
+     * 本月的第几周
+     */
   static int getIndexWeekInMonth(DateTime dateTime) {
     DateTime firstdayInMonth = new DateTime(dateTime.year, dateTime.month, 1);
     Duration duration = dateTime.difference(firstdayInMonth);
@@ -406,8 +404,8 @@ class DateUtil {
   }
 
   /**
-   * 本周的第几天
-   */
+     * 本周的第几天
+     */
   static int getIndexDayInWeek(DateTime dateTime) {
     DateTime firstdayInMonth = new DateTime(
       dateTime.year,
@@ -418,9 +416,9 @@ class DateUtil {
   }
 
   /**
-   * 本月第一天，是那一周的第几天,从1开始
-   * @return 获取日期所在月视图对应的起始偏移量 the start diff with MonthView
-   */
+     * 本月第一天，是那一周的第几天,从1开始
+     * @return 获取日期所在月视图对应的起始偏移量 the start diff with MonthView
+     */
   static int getIndexOfFirstDayInMonth(DateTime dateTime) {
     DateTime firstDayOfMonth = new DateTime(dateTime.year, dateTime.month, 1);
 
@@ -497,8 +495,8 @@ class DateUtil {
   }
 
   /**
-   * 月的行数
-   */
+     * 月的行数
+     */
   static int getMonthViewLineCount(int year, int month) {
     DateTime firstDayOfMonth = new DateTime(year, month, 1);
     int monthDayCount = getMonthDaysCount(year, month);
@@ -511,8 +509,8 @@ class DateUtil {
   }
 
   /**
-   * 获取本周的7个item
-   */
+     * 获取本周的7个item
+     */
   static List<DateModel> initCalendarForWeekView(
       int year, int month, DateTime currentDate, int weekStart,
       {DateModel minSelectDate,
