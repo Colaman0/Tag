@@ -18,7 +18,9 @@ class TextView extends View {
   final String textColorStr;
   Color textColor;
 
-  TextView(this.content, {this.textSize, this.textColorStr, this.textColor});
+  TextView(this.content,
+      {this.textSize, this.textColorStr, this.textColor, Key key})
+      : super(key: key);
 
   @override
   Widget initChild() {

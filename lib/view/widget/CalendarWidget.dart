@@ -33,10 +33,7 @@ class CalendarWidget extends StatelessWidget with BasePage {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             View(
-              child: Card(
-                elevation: 5,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(5))),
+
                 child: Padding(
                     padding: EdgeInsets.all(DP.get(8)),
                     child: Column(
@@ -110,8 +107,8 @@ class CalendarWidget extends StatelessWidget with BasePage {
                         ),
                       ],
                     )),
-              ),
-            ).margin(both: 16)
+
+            ).corner(both: 8).margin(both: 16)
           ],
         ));
   }

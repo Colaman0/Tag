@@ -11,6 +11,7 @@ import 'package:tag/view/flag/EditContent.dart';
 import 'package:tag/view/flag/SelectFlagBg.dart';
 import 'package:tag/view/widget/BuildLineWidget.dart';
 import 'package:tag/view/widget/CalendarWidget.dart';
+import 'package:tag/view/widget/StatusBar.dart';
 import 'package:tag/view/widget/Toast.dart';
 import 'package:tag/view/widget/view/TextView.dart';
 import 'package:tag/view/widget/view/View.dart';
@@ -38,10 +39,8 @@ class BuildFlagRoute extends StatelessWidget {
     pages.add(SelectFlagBg());
     pages.add(EditContent());
 
-    return SafeArea(
-      child: Scaffold(
+    return  Scaffold(
           appBar: AppBar(
-
             actions: <Widget>[
               TextView(
                 "预览",
@@ -54,7 +53,7 @@ class BuildFlagRoute extends StatelessWidget {
             ],
             centerTitle: true,
             title: Text("新建Flag"),
-            backgroundColor: Colors.transparent,
+            backgroundColor: HexColor(Constants.MAIN_COLOR),
           ),
           body: Center(
             child: Column(
@@ -74,7 +73,7 @@ class BuildFlagRoute extends StatelessWidget {
                 bottomActionWidget()
               ],
             ),
-          )),
+      ),
     );
   }
 

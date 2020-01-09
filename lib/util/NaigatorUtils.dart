@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 import 'package:tag/route/BuildFlagRoute.dart';
 import 'package:tag/route/BuildTagRoute.dart';
 import 'package:tag/route/LoginRoute.dart';
@@ -53,6 +54,9 @@ class NavigatorUtils {
   }
 
   void toBuildTag(BuildContext context) {
-    Navigator.of(context).pushNamed("/buildTag");
+    FlutterStatusbarcolor.setStatusBarWhiteForeground(true);
+    Navigator.of(context).pushNamed("/buildTag").whenComplete((){
+      FlutterStatusbarcolor.setStatusBarWhiteForeground(false);
+    });
   }
 }

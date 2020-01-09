@@ -92,6 +92,7 @@ class _MainPageState extends State<MainPage> {
                                     leading: Icon(Icons.flag),
                                     subtitle: Text("记录值得纪念的时刻"),
                                     onTap: () {
+                                      Navigator.of(context).pop();
                                       NavigatorUtils.getInstance().toBuildFlag(context);
                                     },
                                   ),
@@ -101,6 +102,7 @@ class _MainPageState extends State<MainPage> {
                                     leading: Icon(Icons.timelapse),
                                     subtitle: Text("标记未来需要完成的Tag"),
                                     onTap: () {
+                                      Navigator.of(context).pop();
                                       NavigatorUtils.getInstance().toBuildTag(context);
                                     },
                                   )
