@@ -3,8 +3,6 @@ import 'dart:collection';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_custom_calendar/flutter_custom_calendar.dart';
-import 'package:flutter_custom_calendar/widget/calendar_view.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:tag/base/bloc.dart';
 import 'package:tag/bloc/CalendartBloc.dart';
 import 'package:tag/entity/Constants.dart';
@@ -14,18 +12,19 @@ import 'package:tag/view/widget/view/TextView.dart';
 import 'package:tag/view/widget/view/View.dart';
 
 class CalendarWidget extends StatelessWidget with BasePage {
-  CalendarWidget({Key key}) : super(key: key);
+  CalendarWidget({Key key, this.time}) : super(key: key);
+
   static final CAN_WATCH_YEAR = 3;
   static final startIndex = CAN_WATCH_YEAR * 12;
   PageController _controller = new PageController(initialPage: startIndex);
   int _lastPageIndex;
-  final DateTime nowTime = DateTime.now();
+  final DateTime time;
   CalendarBloc _bloc = CalendarBloc();
   HashMap<int, MonthPage> monthPages = HashMap();
 
   @override
   Widget build(BuildContext context) {
-    _bloc.setCreateDate(nowTime);
+    _bloc.setCreateDate(time);
     PageView pageView = getPageView();
     return BlocProvider(
         bloc: _bloc,
@@ -33,81 +32,82 @@ class CalendarWidget extends StatelessWidget with BasePage {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             View(
-
-                child: Padding(
-                    padding: EdgeInsets.all(DP.get(8)),
-                    child: Column(
-                      children: <Widget>[
-                        StreamBuilder<DateTime>(
-                            stream: _bloc.getcurrentShowMonthTimeStream(),
-                            initialData: nowTime,
-                            builder: (context, data) {
-                              DateTime currentShowMonth = data.data;
-                              return View(
-                                child: new Row(
-                                  children: <Widget>[
-                                    new Baseline(
-                                      baseline: 50.0,
-                                      baselineType: TextBaseline.alphabetic,
-                                      child: new Text(
-                                        '${currentShowMonth.year}',
-                                        style: new TextStyle(
-                                          fontSize: 35.0,
-                                          color: HexColor(Constants.COLOR_BLUE),
-                                          textBaseline: TextBaseline.alphabetic,
-                                        ),
+              child: Padding(
+                  padding: EdgeInsets.all(DP.get(8)),
+                  child: Column(
+                    children: <Widget>[
+                      StreamBuilder<DateTime>(
+                          stream: _bloc.getcurrentShowMonthTimeStream(),
+                          initialData: time,
+                          builder: (context, data) {
+                            DateTime currentShowMonth = data.data;
+                            return View(
+                              child: new Row(
+                                children: <Widget>[
+                                  new Baseline(
+                                    baseline: 50.0,
+                                    baselineType: TextBaseline.alphabetic,
+                                    child: new Text(
+                                      '${currentShowMonth.year}',
+                                      style: new TextStyle(
+                                        fontSize: 35.0,
+                                        color: HexColor(Constants.COLOR_BLUE),
+                                        textBaseline: TextBaseline.alphabetic,
                                       ),
                                     ),
-                                    new Baseline(
-                                      baseline: 50.0,
-                                      baselineType: TextBaseline.alphabetic,
-                                      child: new Text(
-                                        ' 年 ',
-                                        style: new TextStyle(
-                                          fontSize: 20.0,
-                                          textBaseline: TextBaseline.alphabetic,
-                                        ),
+                                  ),
+                                  new Baseline(
+                                    baseline: 50.0,
+                                    baselineType: TextBaseline.alphabetic,
+                                    child: new Text(
+                                      ' 年 ',
+                                      style: new TextStyle(
+                                        fontSize: 20.0,
+                                        textBaseline: TextBaseline.alphabetic,
                                       ),
                                     ),
-                                    new Baseline(
-                                      baseline: 50.0,
-                                      baselineType: TextBaseline.alphabetic,
-                                      child: new Text(
-                                        '${currentShowMonth.month}',
-                                        style: new TextStyle(
-                                          fontSize: 35.0,
-                                          color: HexColor(Constants.COLOR_BLUE),
-                                          textBaseline: TextBaseline.alphabetic,
-                                        ),
+                                  ),
+                                  new Baseline(
+                                    baseline: 50.0,
+                                    baselineType: TextBaseline.alphabetic,
+                                    child: new Text(
+                                      '${currentShowMonth.month}',
+                                      style: new TextStyle(
+                                        fontSize: 35.0,
+                                        color: HexColor(Constants.COLOR_BLUE),
+                                        textBaseline: TextBaseline.alphabetic,
                                       ),
                                     ),
-                                    new Baseline(
-                                      baseline: 50.0,
-                                      baselineType: TextBaseline.alphabetic,
-                                      child: new Text(
-                                        ' 月',
-                                        style: new TextStyle(
-                                          fontSize: 20.0,
-                                          textBaseline: TextBaseline.alphabetic,
-                                        ),
+                                  ),
+                                  new Baseline(
+                                    baseline: 50.0,
+                                    baselineType: TextBaseline.alphabetic,
+                                    child: new Text(
+                                      ' 月',
+                                      style: new TextStyle(
+                                        fontSize: 20.0,
+                                        textBaseline: TextBaseline.alphabetic,
                                       ),
                                     ),
-                                  ],
-                                ),
-                              );
-                            }),
-                        SizedBox(
-                          width: double.infinity,
-                          height: 1,
-                        ),
-                        Divider(color: Colors.grey),
-                        AspectRatio(
-                          aspectRatio: 1,
+                                  ),
+                                ],
+                              ),
+                            );
+                          }),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 1,
+                      ),
+                      Divider(color: Colors.grey),
+                      AspectRatio(
+                        aspectRatio: 1.05,
+                        child: Container(
+                          alignment: Alignment.topCenter,
                           child: pageView,
                         ),
-                      ],
-                    )),
-
+                      ),
+                    ],
+                  )),
             ).corner(both: 8).margin(both: 16)
           ],
         ));
@@ -120,11 +120,15 @@ class CalendarWidget extends StatelessWidget with BasePage {
       itemCount: CAN_WATCH_YEAR * 12 * 2,
       onPageChanged: (pageIndex) {
         _lastPageIndex = pageIndex;
-        _bloc.getcurrentShowMonthTimeStream()
+        _bloc
+            .getcurrentShowMonthTimeStream()
             .add(monthPages[pageIndex].getCurrentMonthTime());
       },
       itemBuilder: (context, index) {
-        MonthPage page = MonthPage(index: index, dateTime: nowTime);
+        MonthPage page = MonthPage(
+          index: index,
+          dateTime: time,
+        );
         // 保存每个月的MonthPage控件到map里
         monthPages.putIfAbsent(index, () => page);
         return page;
@@ -142,7 +146,7 @@ class CalendarWidget extends StatelessWidget with BasePage {
 
 class MonthPage extends StatefulWidget {
   final index;
-  final dateTime;
+  final DateTime dateTime;
   _MonthPageState _state;
 
   MonthPage({Key key, this.index, this.dateTime}) : super(key: key);
@@ -189,30 +193,33 @@ class _MonthPageState extends State<MonthPage>
 
     return StreamBuilder<DateTime>(builder: (context, data) {
       return Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Row(children: getWeekTitles()),
           Divider(color: Colors.grey),
-          Flexible(
-            flex: 1,
-            child: GridView.builder(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 7),
-                itemCount: skipCount -
-                    1 +
-                    DateUtil.getMonthDaysCount(
-                        currentMonth.year, currentMonth.month),
-                itemBuilder: (context, index) {
-                  if (index + 1 < skipCount) {
-                    return TextView("");
-                  } else {
-                    int day = index - (skipCount - 2);
-                    // 算出当前item代表的日期
-                    DateTime itemTime =
-                        DateTime(currentMonth.year, currentMonth.month, day);
-                    return DateItem(itemTime);
-                  }
-                }),
-          )
+          MediaQuery.removePadding(
+              removeBottom: true,
+              removeTop: true,
+              context: context,
+              child: GridView.builder(
+                  shrinkWrap: true,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 7),
+                  itemCount: skipCount -
+                      1 +
+                      DateUtil.getMonthDaysCount(
+                          currentMonth.year, currentMonth.month),
+                  itemBuilder: (context, index) {
+                    if (index + 1 < skipCount) {
+                      return TextView("");
+                    } else {
+                      int day = index - (skipCount - 2);
+                      // 算出当前item代表的日期
+                      DateTime itemTime =
+                          DateTime(currentMonth.year, currentMonth.month, day);
+                      return DateItem(itemTime);
+                    }
+                  }))
         ],
       );
     });
@@ -317,16 +324,16 @@ class _DateItemState extends State<DateItem> {
  */
 class DateUtil {
   /**
-     * 判断一个日期是否是周末，即周六日
-     */
+   * 判断一个日期是否是周末，即周六日
+   */
   static bool isWeekend(DateTime dateTime) {
     return dateTime.weekday == DateTime.saturday ||
         dateTime.weekday == DateTime.sunday;
   }
 
   /**
-     * 获取某年的天数
-     */
+   * 获取某年的天数
+   */
   static int getYearDaysCount(int year) {
     if (isLeapYear(year)) {
       return 366;
@@ -335,12 +342,12 @@ class DateUtil {
   }
 
   /**
-     * 获取某月的天数
-     *
-     * @param year  年
-     * @param month 月
-     * @return 某月的天数
-     */
+   * 获取某月的天数
+   *
+   * @param year  年
+   * @param month 月
+   * @return 某月的天数
+   */
   static int getMonthDaysCount(int year, int month) {
     int count = 0;
     //判断大月份
@@ -371,8 +378,8 @@ class DateUtil {
   }
 
   /**
-     * 是否是今天
-     */
+   * 是否是今天
+   */
   static bool isCurrentDay(int year, int month, int day) {
     DateTime now = DateTime.now();
     return now.year == year && now.month == month && now.day == day;
@@ -385,15 +392,15 @@ class DateUtil {
   }
 
   /**
-     * 是否是闰年
-     */
+   * 是否是闰年
+   */
   static bool isLeapYear(int year) {
     return ((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0);
   }
 
   /**
-     * 本月的第几周
-     */
+   * 本月的第几周
+   */
   static int getIndexWeekInMonth(DateTime dateTime) {
     DateTime firstdayInMonth = new DateTime(dateTime.year, dateTime.month, 1);
     Duration duration = dateTime.difference(firstdayInMonth);
@@ -401,8 +408,8 @@ class DateUtil {
   }
 
   /**
-     * 本周的第几天
-     */
+   * 本周的第几天
+   */
   static int getIndexDayInWeek(DateTime dateTime) {
     DateTime firstdayInMonth = new DateTime(
       dateTime.year,
@@ -413,9 +420,9 @@ class DateUtil {
   }
 
   /**
-     * 本月第一天，是那一周的第几天,从1开始
-     * @return 获取日期所在月视图对应的起始偏移量 the start diff with MonthView
-     */
+   * 本月第一天，是那一周的第几天,从1开始
+   * @return 获取日期所在月视图对应的起始偏移量 the start diff with MonthView
+   */
   static int getIndexOfFirstDayInMonth(DateTime dateTime) {
     DateTime firstDayOfMonth = new DateTime(dateTime.year, dateTime.month, 1);
 
@@ -492,8 +499,8 @@ class DateUtil {
   }
 
   /**
-     * 月的行数
-     */
+   * 月的行数
+   */
   static int getMonthViewLineCount(int year, int month) {
     DateTime firstDayOfMonth = new DateTime(year, month, 1);
     int monthDayCount = getMonthDaysCount(year, month);
@@ -506,8 +513,8 @@ class DateUtil {
   }
 
   /**
-     * 获取本周的7个item
-     */
+   * 获取本周的7个item
+   */
   static List<DateModel> initCalendarForWeekView(
       int year, int month, DateTime currentDate, int weekStart,
       {DateModel minSelectDate,

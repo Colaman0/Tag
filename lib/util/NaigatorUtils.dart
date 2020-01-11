@@ -20,8 +20,12 @@ class NavigatorUtils {
     "/": (BuildContext context) => SplashRoute(),
     "/login": (BuildContext context) => LoginRoute(),
     "/main": (BuildContext context) => MainPage(),
-    "/buildFlag": (BuildContext context) => BuildFlagRoute(),
-    "/buildTag": (BuildContext context) => BuildTagRoute(),
+    "/buildFlag": (BuildContext context) => BuildTagRoute(
+          buildType: BuildTagRoute.FLAG,
+        ),
+    "/buildTag": (BuildContext context) => BuildTagRoute(
+          buildType: BuildTagRoute.TAG,
+        ),
   };
 
   NavigatorUtils._();
@@ -55,7 +59,7 @@ class NavigatorUtils {
 
   void toBuildTag(BuildContext context) {
     FlutterStatusbarcolor.setStatusBarWhiteForeground(true);
-    Navigator.of(context).pushNamed("/buildTag").whenComplete((){
+    Navigator.of(context).pushNamed("/buildTag").whenComplete(() {
       FlutterStatusbarcolor.setStatusBarWhiteForeground(false);
     });
   }

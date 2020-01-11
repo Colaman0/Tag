@@ -1,20 +1,29 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_custom_calendar/utils/solar_term_util.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:tag/base/bloc.dart';
+import 'package:tag/bloc/BuildFlagBloc.dart';
+import 'package:tag/bloc/BuildTagBloc.dart';
 import 'package:tag/entity/Constants.dart';
 import 'package:tag/imp/basePage.dart';
+import 'package:tag/route/BuildTagRoute.dart';
 import 'package:tag/util/util.dart';
+import 'package:tag/view/widget/view/TextView.dart';
 import 'package:tag/view/widget/view/View.dart';
 
 import '../BaseBuildPage.dart';
 
 class SelectFlagBg extends StatelessWidget with BasePage {
+  BuildTagBloc _bloc;
+
   File _file;
 
   @override
   Widget build(BuildContext context) {
+    _bloc = BlocProvider.of(context);
     PublishSubject<File> subject = PublishSubject();
     return StreamBuilder(
       stream: subject,
@@ -31,7 +40,7 @@ class SelectFlagBg extends StatelessWidget with BasePage {
                         fit: StackFit.expand,
                         children: <Widget>[
                           Positioned(
-                            child: Image.file(data.data),
+                            child: Image.file(data.data, fit: BoxFit.fitHeight),
                           ),
                           Positioned(
                             right: 0,
@@ -41,17 +50,18 @@ class SelectFlagBg extends StatelessWidget with BasePage {
                                         size: 16, color: Colors.white))
                                 .padding(both: 8)
                                 .corner(both: 5)
-                                .backgroundColor(Colors.white70)
+                                .backgroundColor(Colors.black38)
                                 .click(() {
                               subject.add(null);
                             }),
                           ),
+                          getDays()
                         ],
                       ))
             .corner(both: 5)
             .margin(both: 24)
             .size(width: View.MATCH, height: 256)
-            .backgroundColorStr(Constants.COLOR_3)
+            .backgroundColor(Colors.black38)
             .click(() {
           ImagePicker.pickImage(source: ImageSource.gallery).then((image) {
             _file = image;
@@ -61,6 +71,22 @@ class SelectFlagBg extends StatelessWidget with BasePage {
           });
         });
       },
+    );
+  }
+
+  Widget getDays() {
+    return Positioned(
+      child: StreamBuilder(
+        initialData: DateTime.now(),
+        stream: _bloc.getSelectDateStream(),
+        builder: (context, data) {
+          return TextView(
+            DateTime.now().difference(DateTime.now()).inDays.toString(),
+            textSize: 40,
+            textColor: Colors.white,
+          );
+        },
+      ),
     );
   }
 

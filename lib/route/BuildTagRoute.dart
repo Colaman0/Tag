@@ -1,15 +1,14 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:tag/base/bloc.dart';
+import 'package:tag/bloc/BuildFlagBloc.dart';
 import 'package:tag/bloc/BuildTagBloc.dart';
 import 'package:tag/entity/Constants.dart';
 import 'package:tag/imp/basePage.dart';
 import 'package:tag/util/util.dart';
+import 'package:tag/view/flag/SelectFlagBg.dart';
 import 'package:tag/view/widget/CalendarWidget.dart';
 import 'package:tag/view/widget/StatusBar.dart';
 import 'package:tag/view/widget/TimeSelectWidget.dart';
@@ -17,7 +16,14 @@ import 'package:tag/view/widget/view/TextView.dart';
 import 'package:tag/view/widget/view/View.dart';
 
 class BuildTagRoute extends StatelessWidget {
-  BuildTagBloc _bloc = BuildTagBloc();
+  static final TAG = "Tag";
+  static final FLAG = "Flag";
+
+  // build类型
+  final buildType;
+
+  BuildTagBloc _tagBloc = BuildTagBloc();
+
   PublishSubject pageStream = PublishSubject<int>();
 
   PageController _pageController = PageController();
@@ -25,29 +31,42 @@ class BuildTagRoute extends StatelessWidget {
 
   Color mainColor = HexColor(Constants.COLOR_BLUE);
 
+  BuildTagRoute({this.buildType});
+
   @override
   Widget build(BuildContext context) {
     pages.clear();
-    pages.add(DateTimeWidget());
+    pages.addAll(getPages());
+
     return StatusBar(
         color: HexColor(Constants.COLOR_BLUE),
         child: BlocProvider(
-          bloc: _bloc,
+          bloc: _tagBloc,
           child: Container(
             color: mainColor,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                View(
-                  child: Icon(Icons.arrow_back,
-                      size: DP.get(48), color: Colors.white),
-                ).size(width: 64, height: 64).click(() {
-                  Navigator.of(context).pop();
-                }),
+                Row(
+                  children: <Widget>[
+                    View(
+                      child: Icon(Icons.arrow_back,
+                          size: DP.get(48), color: Colors.white),
+                    ).size(width: 64, height: 64).click(() {
+                      Navigator.of(context).pop();
+                    }),
+                    Hero(
+                      tag: buildType,
+                      child: TextView(buildType,
+                              textColor: Colors.white, textSize: 35)
+                          .margin(left: 16),
+                    )
+                  ],
+                ),
                 StreamBuilder(
-                  initialData: "选择日期",
-                  stream: _bloc.getFuntionStrStream(),
+                  initialData: "选择时间",
+                  stream: _tagBloc.getFuntionStrStream(),
                   builder: (context, data) => AnimatedSwitcher(
                     duration: const Duration(milliseconds: 500),
                     child: TextView(
@@ -85,12 +104,23 @@ class BuildTagRoute extends StatelessWidget {
         ));
   }
 
+  List<Widget> getPages() {
+    List<Widget> pages = List();
+    pages.add(DateTimeWidget(DateTime.now()));
+    if (buildType == TAG) {
+    } else {
+      pages.add(SelectFlagBg());
+    }
+    return pages;
+  }
+
   Widget getTitles() {
     return Row(
       children: <Widget>[],
     );
   }
 
+  // 底部action 用于切换上一步下一步
   Widget bottomActionWidget() {
     return StreamBuilder(
       initialData: 0,
@@ -126,17 +156,16 @@ class BuildTagRoute extends StatelessWidget {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.all(Radius.circular(30))),
                 onPressed: () {
-                  showTimePicker(
-                      context: context, initialTime: TimeOfDay.now());
-                  if (page >= pages.length) {
+                  if (page >= pages.length - 1) {
                     // 提交
                     return;
                   }
-                  BasePage basePage = (pages[page] as BasePage);
+                  int nextPage = ++page;
+                  BasePage basePage = (pages[nextPage] as BasePage);
                   if (basePage.dataVaild()) {
-                    _pageController.animateToPage(++page,
+                    _pageController.animateToPage(nextPage,
                         duration: Duration(milliseconds: 100),
-                        curve: Curves.bounceIn);
+                        curve: Curves.linear);
                   } else {
                     Fluttertoast.showToast(msg: basePage.dataTips());
                   }
@@ -150,26 +179,50 @@ class BuildTagRoute extends StatelessWidget {
   }
 }
 
-class DateTimeWidget extends StatefulWidget {
+// 时间选择器widget
+class DateTimeWidget extends StatefulWidget with BasePage {
+  final DateTime dateTime;
+
+  DateTimeWidget(this.dateTime);
+
   @override
-  _DateTimeWidgetState createState() => _DateTimeWidgetState();
+  _DateTimeWidgetState createState() => _DateTimeWidgetState(dateTime);
+
+  @override
+  String dataTips() {
+    // TODO: implement dataTips
+    return "请选择日期";
+  }
+
+  @override
+  bool dataVaild() {
+    return true;
+  }
 }
 
 class _DateTimeWidgetState extends State<DateTimeWidget> {
+  final DateTime dateTime;
+
+  _DateTimeWidgetState(this.dateTime);
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: View(
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            CalendarWidget(),
-            TimeSelectView()
+            CalendarWidget(time: dateTime),
+            TimeSelectView(
+              dateTime: dateTime,
+            )
           ],
         ),
       ),
     );
   }
 
+  // 选择时间的item
   Widget getTimeItem(int value) {
     BuildTagBloc bloc = BlocProvider.of(context);
 
