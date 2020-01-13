@@ -1,3 +1,4 @@
+import 'package:google_fonts/google_fonts.dart';
 import 'package:tag/util/util.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +18,9 @@ class TextView extends View {
   final String textColorStr;
   Color textColor;
 
-  TextView(this.content, {this.textSize, this.textColorStr, this.textColor});
+  TextView(this.content,
+      {this.textSize, this.textColorStr, this.textColor, Key key})
+      : super(key: key);
 
   @override
   Widget initChild() {
@@ -28,8 +31,14 @@ class TextView extends View {
     if (textColor == null) {
       textColor = Colors.black;
     }
-    return Text(content,
-        softWrap: true,
-        style: TextStyle(fontSize: SP.get(textSize ?? 18), color: textColor, decoration: TextDecoration.none));
+    return Text(
+      content,
+      softWrap: true,
+      style: GoogleFonts.rubik(
+          textStyle: TextStyle(
+              fontSize: SP.get(textSize ?? 18),
+              color: textColor,
+              decoration: TextDecoration.none)),
+    );
   }
 }

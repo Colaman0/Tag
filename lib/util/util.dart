@@ -20,6 +20,7 @@ class DP {
     }
     return ScreenUtil.getInstance().setWidth(dp.toDouble());
   }
+
 }
 
 class SP {

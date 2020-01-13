@@ -1,5 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
+import 'package:tag/route/BuildFlagRoute.dart';
+import 'package:tag/route/BuildTagRoute.dart';
 import 'package:tag/route/LoginRoute.dart';
 import 'package:tag/route/SplashRoute.dart';
 import 'package:tag/route/main/MainPage.dart';
@@ -17,6 +20,12 @@ class NavigatorUtils {
     "/": (BuildContext context) => SplashRoute(),
     "/login": (BuildContext context) => LoginRoute(),
     "/main": (BuildContext context) => MainPage(),
+    "/buildFlag": (BuildContext context) => BuildTagRoute(
+          buildType: BuildTagRoute.FLAG,
+        ),
+    "/buildTag": (BuildContext context) => BuildTagRoute(
+          buildType: BuildTagRoute.TAG,
+        ),
   };
 
   NavigatorUtils._();
@@ -34,11 +43,24 @@ class NavigatorUtils {
 
   /// 跳转到登录页面，并且清空其他路由
   void toLogin(BuildContext context) {
-    Navigator.of(context).pushNamedAndRemoveUntil('/login', (Route<dynamic> route) => false);
+    Navigator.of(context)
+        .pushNamedAndRemoveUntil('/login', (Route<dynamic> route) => false);
   }
 
   /// 跳转到主页面，并且清空其他路由
   void toMain(BuildContext context) {
-    Navigator.of(context).pushNamedAndRemoveUntil('/main', (Route<dynamic> route) => false);
+    Navigator.of(context)
+        .pushNamedAndRemoveUntil('/main', (Route<dynamic> route) => false);
+  }
+
+  void toBuildFlag(BuildContext context) {
+    Navigator.of(context).pushNamed("/buildFlag");
+  }
+
+  void toBuildTag(BuildContext context) {
+    FlutterStatusbarcolor.setStatusBarWhiteForeground(true);
+    Navigator.of(context).pushNamed("/buildTag").whenComplete(() {
+      FlutterStatusbarcolor.setStatusBarWhiteForeground(false);
+    });
   }
 }
