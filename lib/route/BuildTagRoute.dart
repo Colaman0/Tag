@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:tag/base/bloc.dart';
-import 'package:tag/bloc/BuildFlagBloc.dart';
 import 'package:tag/bloc/BuildTagBloc.dart';
 import 'package:tag/entity/Constants.dart';
 import 'package:tag/imp/basePage.dart';
@@ -106,11 +105,18 @@ class BuildTagRoute extends StatelessWidget {
 
   List<Widget> getPages() {
     List<Widget> pages = List();
-    pages.add(DateTimeWidget(DateTime.now()));
+    pages.add(DateTimeWidget(DateTime.now(), _tagBloc));
     if (buildType == TAG) {
     } else {
       pages.add(SelectFlagBg());
     }
+    /// 把bloc注入到每一个Page当中
+    pages.forEach((page) {
+      if (page is BasePage) {
+        (page as BasePage).injectBloc(_tagBloc);
+      }
+    });
+
     return pages;
   }
 
@@ -160,10 +166,11 @@ class BuildTagRoute extends StatelessWidget {
                     // 提交
                     return;
                   }
-                  int nextPage = ++page;
-                  BasePage basePage = (pages[nextPage] as BasePage);
+                  BasePage basePage = (pages[page] as BasePage);
                   if (basePage.dataVaild()) {
-                    _pageController.animateToPage(nextPage,
+                    /// 切换到下一页的时候保存当页的数据
+                    basePage.saveData();
+                    _pageController.animateToPage(++page,
                         duration: Duration(milliseconds: 100),
                         curve: Curves.linear);
                   } else {
@@ -182,11 +189,16 @@ class BuildTagRoute extends StatelessWidget {
 // 时间选择器widget
 class DateTimeWidget extends StatefulWidget with BasePage {
   final DateTime dateTime;
+  final BuildTagBloc _tagBloc;
+  _DateTimeWidgetState _state;
 
-  DateTimeWidget(this.dateTime);
+  DateTimeWidget(this.dateTime, this._tagBloc);
 
   @override
-  _DateTimeWidgetState createState() => _DateTimeWidgetState(dateTime);
+  _DateTimeWidgetState createState() {
+    _state = _DateTimeWidgetState(dateTime, _tagBloc);
+    return _state;
+  }
 
   @override
   String dataTips() {
@@ -198,12 +210,40 @@ class DateTimeWidget extends StatefulWidget with BasePage {
   bool dataVaild() {
     return true;
   }
+
+  @override
+  void saveData() => _state.saveData();
 }
 
 class _DateTimeWidgetState extends State<DateTimeWidget> {
   final DateTime dateTime;
+  final BuildTagBloc _tagBloc;
 
-  _DateTimeWidgetState(this.dateTime);
+  _DateTimeWidgetState(this.dateTime, this._tagBloc);
+
+  CalendarWidget _calendarWidget;
+
+  TimeSelectView _timeSelectView;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _calendarWidget = CalendarWidget(time: dateTime);
+    _timeSelectView = TimeSelectView(dateTime: dateTime);
+  }
+
+  /// 保存用户最后选中的日期
+  void saveData() {
+    var selectDate = _calendarWidget.getSelectDate();
+    DateTime finalSelectDate = DateTime(
+        selectDate.year,
+        selectDate.month,
+        selectDate.day,
+        _timeSelectView.getSelectHour(),
+        _timeSelectView.getSelectMin());
+    _tagBloc.selectDate(finalSelectDate);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -211,44 +251,9 @@ class _DateTimeWidgetState extends State<DateTimeWidget> {
       child: View(
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            CalendarWidget(time: dateTime),
-            TimeSelectView(
-              dateTime: dateTime,
-            )
-          ],
+          children: <Widget>[_calendarWidget, _timeSelectView],
         ),
       ),
-    );
-  }
-
-  // 选择时间的item
-  Widget getTimeItem(int value) {
-    BuildTagBloc bloc = BlocProvider.of(context);
-
-    return StreamBuilder<int>(
-      stream: bloc.getSelectTimeStream(),
-      initialData: 9,
-      builder: (context, data) {
-        bool isSame = data.data == value;
-        return Expanded(
-            child: AspectRatio(
-                aspectRatio: 1,
-                child: TextView(
-                  value > 12 ? (value - 12).toString() : value.toString(),
-                  textSize: isSame ? 24 : 20,
-                  textColor: isSame ? Colors.white : Colors.black,
-                )
-                    .aligment(Alignment.center)
-                    .corner(both: 5)
-                    .backgroundColor(isSame
-                        ? HexColor(Constants.MAIN_COLOR)
-                        : Colors.transparent)
-                    .margin(both: 8)
-                    .click(() {
-                  bloc.getSelectTimeStream().add(value);
-                })));
-      },
     );
   }
 }

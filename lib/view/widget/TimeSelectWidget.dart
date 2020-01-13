@@ -17,6 +17,8 @@ class TimeSelectView extends StatelessWidget {
   PublishSubject<int> hourItemStream = PublishSubject();
   PublishSubject<int> minItemStream = PublishSubject();
 
+  int selectHour, selectMin;
+
   TimeSelectView({Key key, this.dateTime}) : super(key: key) {
     for (int i = 1; i < 24; i++) {
       hours.add(i);
@@ -29,6 +31,10 @@ class TimeSelectView extends StatelessWidget {
         FixedExtentScrollController(initialItem: dateTime.hour - 1);
     _minController = FixedExtentScrollController(initialItem: dateTime.minute);
   }
+
+  int getSelectHour() => ++selectHour;
+
+  int getSelectMin() => selectMin;
 
   @override
   Widget build(BuildContext context) {
@@ -63,15 +69,18 @@ class TimeSelectView extends StatelessWidget {
         childDelegate: ListWheelChildListDelegate(
           children: hours.map((value) {
             return StreamBuilder<int>(
-              initialData: dateTime.hour-1,
-              stream: hourItemStream,
-              builder: (context, data) => TextView(
-                value.toString().padLeft(2, '0'),
-                textSize: (value - 1) == data.data ? 35 : 25,
-                textColor:
-                    (value - 1) == data.data ? Colors.white : Colors.white70,
-              ),
-            );
+                initialData: dateTime.hour - 1,
+                stream: hourItemStream,
+                builder: (context, data) {
+                  selectHour = data.data;
+                  return TextView(
+                    value.toString().padLeft(2, '0'),
+                    textSize: (value - 1) == data.data ? 35 : 25,
+                    textColor: (value - 1) == data.data
+                        ? Colors.white
+                        : Colors.white70,
+                  );
+                });
           }).toList(),
         ),
       );
@@ -84,14 +93,17 @@ class TimeSelectView extends StatelessWidget {
         childDelegate: ListWheelChildListDelegate(
           children: mins.map((value) {
             return StreamBuilder<int>(
-              initialData: dateTime.minute,
-              stream: minItemStream,
-              builder: (context, data) => TextView(
-                value.toString().padLeft(2, '0'),
-                textSize: value == data.data ? 35 : 25,
-                textColor: value == data.data ? Colors.white : Colors.white70,
-              ),
-            );
+                initialData: dateTime.minute,
+                stream: minItemStream,
+                builder: (context, data) {
+                  selectMin = data.data;
+                  return TextView(
+                    value.toString().padLeft(2, '0'),
+                    textSize: value == data.data ? 35 : 25,
+                    textColor:
+                        value == data.data ? Colors.white : Colors.white70,
+                  );
+                });
           }).toList(),
         ),
       );

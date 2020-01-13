@@ -24,6 +24,7 @@ class SelectFlagBg extends StatelessWidget with BasePage {
   @override
   Widget build(BuildContext context) {
     _bloc = BlocProvider.of(context);
+    _bloc.getSelectDate();
     PublishSubject<File> subject = PublishSubject();
     return StreamBuilder(
       stream: subject,
@@ -97,5 +98,10 @@ class SelectFlagBg extends StatelessWidget with BasePage {
   String dataTips() {
     // TODO: implement dataTips
     return "";
+  }
+
+  @override
+  void saveData() {
+    // TODO: implement saveData
   }
 }

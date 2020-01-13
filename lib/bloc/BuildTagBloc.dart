@@ -13,7 +13,11 @@ class BuildTagBloc extends BlocBase {
   PublishSubject<DateTime> getSelectDateStream() => _selectDateStream;
   DateTime _selectDateTime;
 
-  void selectDate(){}
+  void selectDate(DateTime dateTime) {
+    _selectDateTime = dateTime;
+  }
+
+  DateTime getSelectDate() => _selectDateTime;
 
   @override
   void dispose() {

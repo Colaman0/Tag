@@ -22,6 +22,9 @@ class CalendarWidget extends StatelessWidget with BasePage {
   CalendarBloc _bloc = CalendarBloc();
   HashMap<int, MonthPage> monthPages = HashMap();
 
+  // 获取选中的日期 年月日
+  DateTime getSelectDate() => _bloc?.getSelectDate();
+
   @override
   Widget build(BuildContext context) {
     _bloc.setCreateDate(time);
@@ -141,6 +144,11 @@ class CalendarWidget extends StatelessWidget with BasePage {
   String dataTips() {
     // TODO: implement dataTips
     return "";
+  }
+
+  @override
+  void saveData() {
+    // TODO: implement saveData
   }
 }
 
