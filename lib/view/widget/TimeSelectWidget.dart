@@ -1,5 +1,9 @@
+import 'dart:collection';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:tag/util/util.dart';
 import 'package:tag/view/widget/view/TextView.dart';
 import 'package:tag/view/widget/view/View.dart';
 
@@ -16,10 +20,11 @@ class TimeSelectView extends StatelessWidget {
 
   PublishSubject<int> hourItemStream = PublishSubject();
   PublishSubject<int> minItemStream = PublishSubject();
+  PublishSubject<DateTime> timeStream;
 
   int selectHour, selectMin;
 
-  TimeSelectView({Key key, this.dateTime}) : super(key: key) {
+  TimeSelectView({Key key, this.dateTime, this.timeStream}) : super(key: key) {
     for (int i = 1; i < 24; i++) {
       hours.add(i);
     }
@@ -39,26 +44,57 @@ class TimeSelectView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return View(
-      child: Row(
+      child: Column(
         children: <Widget>[
-          Expanded(
-            child: getHours(),
+          SizedBox(
+            width: double.infinity,
+            child: Row(mainAxisSize: MainAxisSize.min, children: <Widget>[
+              TextView(
+                "取消",
+                textSize: 22,
+                textColor: Colors.white,
+              ).padding(top: 12, bottom: 12, left: 24, right: 24).click(() {
+                Navigator.of(context).pop();
+              }),
+              Spacer(),
+              TextView(
+                "确定",
+                textSize: 22,
+                textColor: Colors.white,
+              ).padding(top: 12, bottom: 12, left: 24, right: 24).click(() {
+                timeStream.add(DateTime(dateTime.year, dateTime.month,
+                    dateTime.day, selectHour + 1, selectMin));
+                Navigator.of(context).pop();
+              }),
+            ]),
           ),
-          TextView(
-            ":",
-            textSize: 50,
-            textColor: Colors.white,
+          Container(
+            color: Colors.white,
+            height: 0.1,
+            margin: EdgeInsets.only(bottom: DP.get(8)),
           ),
           Expanded(
-            child: getMins(),
-          )
+              child: Row(
+            children: <Widget>[
+              Expanded(
+                child: getHours(),
+              ),
+              TextView(
+                ":",
+                textSize: 50,
+                textColor: Colors.white,
+              ),
+              Expanded(
+                child: getMins(),
+              )
+            ],
+          ))
         ],
       ),
     )
-        .margin(both: 16)
-        .corner(both: 8)
+        .padding(bottom: 32)
         .backgroundColorStr("#3282b8")
-        .size(width: View.MATCH, height: 120);
+        .size(width: View.MATCH, height: 220);
   }
 
   Widget getHours() => ListWheelScrollView.useDelegate(
