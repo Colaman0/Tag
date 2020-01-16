@@ -54,4 +54,10 @@ class EditContent extends StatelessWidget with BasePage {
   void saveData() {
     // TODO: implement saveData
   }
+
+  @override
+  String getFunctionTitle() {
+    // TODO: implement getFunctionTitle
+    return null;
+  }
 }

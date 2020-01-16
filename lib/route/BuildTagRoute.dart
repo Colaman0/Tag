@@ -1,16 +1,11 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:tag/base/bloc.dart';
 import 'package:tag/bloc/BuildTagBloc.dart';
 import 'package:tag/entity/Constants.dart';
-import 'package:tag/imp/basePage.dart';
+import 'package:tag/util/NaigatorUtils.dart';
 import 'package:tag/util/util.dart';
-import 'package:tag/view/flag/SelectFlagBg.dart';
-import 'package:tag/view/widget/CalendarWidget.dart';
-import 'package:tag/view/widget/StatusBar.dart';
-import 'package:tag/view/widget/TimeSelectWidget.dart';
 import 'package:tag/view/widget/view/TextView.dart';
 import 'package:tag/view/widget/view/View.dart';
 
@@ -22,238 +17,234 @@ class BuildTagRoute extends StatelessWidget {
   final buildType;
 
   BuildTagBloc _tagBloc = BuildTagBloc();
+  BuildContext _context;
 
   PublishSubject pageStream = PublishSubject<int>();
 
   PageController _pageController = PageController();
   List<Widget> pages = List();
 
-  Color mainColor = HexColor(Constants.COLOR_BLUE);
+  Color mainColor = HexColor("#FBDDCA");
 
   BuildTagRoute({this.buildType});
 
   @override
   Widget build(BuildContext context) {
-    pages.clear();
-    pages.addAll(getPages());
-
-    return StatusBar(
-        color: HexColor(Constants.COLOR_BLUE),
-        child: BlocProvider(
-          bloc: _tagBloc,
-          child: Container(
-            color: mainColor,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    View(
-                      child: Icon(Icons.arrow_back,
-                          size: DP.get(48), color: Colors.white),
-                    ).size(width: 64, height: 64).click(() {
-                      Navigator.of(context).pop();
-                    }),
-                    Hero(
-                      tag: buildType,
-                      child: TextView(buildType,
-                              textColor: Colors.white, textSize: 35)
-                          .margin(left: 16),
-                    )
-                  ],
+    _context = context;
+    return BlocProvider(
+        bloc: _tagBloc,
+        child: Container(
+          padding: EdgeInsets.only(top: ScreenUtil.statusBarHeight),
+          decoration: BoxDecoration(
+              gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: <Color>[HexColor("#13547a"), HexColor("#80d0c7")])),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              View(
+                child: Icon(Icons.arrow_back,
+                    size: DP.get(48), color: Colors.white),
+              ).size(width: 64, height: 64).click(() {
+                Navigator.of(context).pop();
+              }),
+              TextView(
+                "Create",
+                textSize: 40,
+                textColor: Colors.white,
+              ).aligment(Alignment.centerLeft).margin(left: 16, top: 12),
+              TextView(
+                "New Flag",
+                textSize: 40,
+                textColor: Colors.white,
+              ).aligment(Alignment.centerLeft).margin(left: 16, top: 4),
+              View(
+                  child: Material(
+                color: Colors.transparent,
+                child: TextField(
+                  style: TextStyle(color: Colors.white, fontSize: SP.get(28)),
+                  cursorColor: Colors.white70,
+                  maxLines: 1,
+                  maxLength: 10,
+                  autofocus: true,
+                  decoration: InputDecoration(
+                      focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(
+                              color: HexColor(Constants.MAIN_COLOR))),
+                      hintStyle: TextStyle(color: Colors.white),
+                      hintText: "输入标题",
+                      border: UnderlineInputBorder(
+                          borderSide: BorderSide(
+                              color: HexColor(Constants.MAIN_COLOR)))),
                 ),
-                StreamBuilder(
-                  initialData: "选择时间",
-                  stream: _tagBloc.getFuntionStrStream(),
-                  builder: (context, data) => AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 500),
-                    child: TextView(
-                      data.data,
-                      textSize: 36,
-                      textColor: Colors.white,
-                      key: ValueKey<String>(data.data),
-                    ).aligment(Alignment.centerLeft).margin(left: 16, top: 16),
+              )).margin(left: 16, right: 16, top: 16),
+              SizedBox(
+                height: DP.get(24),
+              ),
+              Expanded(
+                child: View(
+                  child: Column(
+                    children: <Widget>[
+                      getDateItem(),
+                      getTimeItem(),
+                      getBackgroundItem(),
+                      getCategoryItem(),
+                      Spacer(),
+                      getConfirmButton()
+                    ],
                   ),
-                ),
-                Expanded(
-                  child: View(
-                    child: Column(
-                      children: <Widget>[
-                        Expanded(
-                          child: PageView(
-                            onPageChanged: (page) => pageStream.add(page),
-                            controller: _pageController,
-                            physics: NeverScrollableScrollPhysics(),
-                            children: pages,
-                          ),
-                        ),
-                        bottomActionWidget()
-                      ],
-                    ),
-                  )
-                      .size(width: View.MATCH, height: View.MATCH)
-                      .corner(leftTop: 24, rightTop: 24)
-                      .margin(top: 48)
-                      .backgroundColor(Colors.white),
                 )
-              ],
-            ),
+                    .padding(both: 32)
+                    .size(width: View.MATCH, height: View.MATCH)
+                    .corner(leftTop: 30, rightTop: 30)
+                    .backgroundColor(Colors.white),
+              )
+            ],
           ),
         ));
   }
 
-  List<Widget> getPages() {
-    List<Widget> pages = List();
-    pages.add(DateTimeWidget(DateTime.now(), _tagBloc));
-    if (buildType == TAG) {
-    } else {
-      pages.add(SelectFlagBg());
-    }
-    /// 把bloc注入到每一个Page当中
-    pages.forEach((page) {
-      if (page is BasePage) {
-        (page as BasePage).injectBloc(_tagBloc);
-      }
+  Widget getDateItem() {
+    DateTime time;
+    return View(
+      child: Column(
+        children: <Widget>[
+          TextView(
+            "日期",
+            textSize: 24,
+            textColor: Colors.grey,
+          ).aligment(Alignment.centerLeft),
+          StreamBuilder<DateTime>(
+              initialData: DateTime.now(),
+              stream: _tagBloc.getSelectDateStream(),
+              builder: (context, data) {
+                DateTime date = data.data;
+                time = date;
+                String dateStr = "${date.year} 年 ${date.month} 月 ${date.day} 日";
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: <Widget>[
+                    Expanded(
+                      child: TextView(
+                        dateStr,
+                        textSize: 28,
+                      ).aligment(Alignment.centerLeft).margin(top: 12),
+                    ),
+                    Icon(
+                      Icons.calendar_today,
+                      size: DP.get(24),
+                      color: HexColor("#313B79"),
+                    )
+                  ],
+                );
+              }),
+          Divider(
+            color: HexColor("#313B79"),
+          )
+        ],
+      ),
+    ).click(() {
+      NavigatorUtils.getInstance().toSelectDate(_context, time).then((date){
+        _tagBloc.getSelectDateStream().add(date);
+      });
     });
-
-    return pages;
   }
 
-  Widget getTitles() {
-    return Row(
-      children: <Widget>[],
-    );
+  Widget getTimeItem() {
+    return View(
+      child: Column(
+        children: <Widget>[
+          TextView(
+            "时间",
+            textSize: 24,
+            textColor: Colors.grey,
+          ).aligment(Alignment.centerLeft),
+          StreamBuilder<DateTime>(
+              initialData: DateTime.now(),
+              stream: _tagBloc.getSelectDateStream(),
+              builder: (context, data) {
+                DateTime date = data.data;
+                String dateStr = "${date.hour} 时 ${date.minute} 分 ";
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: <Widget>[
+                    Expanded(
+                      child: TextView(
+                        dateStr,
+                        textSize: 28,
+                      ).aligment(Alignment.centerLeft).margin(top: 12),
+                    ),
+                    Icon(
+                      Icons.timelapse,
+                      size: DP.get(24),
+                      color: HexColor("#313B79"),
+                    )
+                  ],
+                );
+              }),
+          Divider(
+            color: HexColor("#313B79"),
+          )
+        ],
+      ),
+    ).margin(top: 32, bottom: 32).click(() {});
   }
 
-  // 底部action 用于切换上一步下一步
-  Widget bottomActionWidget() {
-    return StreamBuilder(
-      initialData: 0,
-      stream: pageStream,
-      builder: (context, data) {
-        int page = data.data;
-        return Container(
-          margin: EdgeInsets.only(top: DP.get(32), bottom: DP.get(32)),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-              OutlineButton(
-                textColor: Colors.black,
-                disabledTextColor: Colors.grey,
-                child: Text("上一步"),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(30))),
-                onPressed: page == 0
-                    ? null
-                    : () {
-                        _pageController.animateToPage(--page,
-                            duration: Duration(milliseconds: 100),
-                            curve: Curves.bounceIn);
-                      },
-              ),
-              MaterialButton(
-                animationDuration: Duration(microseconds: 300),
-                color: HexColor(Constants.COLOR_BLUE),
-                textColor: Colors.white,
-                disabledTextColor: Colors.white,
-                disabledColor: HexColor(Constants.COLOR_3),
-                child: Text("下一步"),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(30))),
-                onPressed: () {
-                  if (page >= pages.length - 1) {
-                    // 提交
-                    return;
-                  }
-                  BasePage basePage = (pages[page] as BasePage);
-                  if (basePage.dataVaild()) {
-                    /// 切换到下一页的时候保存当页的数据
-                    basePage.saveData();
-                    _pageController.animateToPage(++page,
-                        duration: Duration(milliseconds: 100),
-                        curve: Curves.linear);
-                  } else {
-                    Fluttertoast.showToast(msg: basePage.dataTips());
-                  }
-                },
-              )
-            ],
-          ),
-        );
-      },
-    );
-  }
-}
-
-// 时间选择器widget
-class DateTimeWidget extends StatefulWidget with BasePage {
-  final DateTime dateTime;
-  final BuildTagBloc _tagBloc;
-  _DateTimeWidgetState _state;
-
-  DateTimeWidget(this.dateTime, this._tagBloc);
-
-  @override
-  _DateTimeWidgetState createState() {
-    _state = _DateTimeWidgetState(dateTime, _tagBloc);
-    return _state;
+  Widget getBackgroundItem() {
+    return Column(children: <Widget>[
+      TextView(
+        "背景图",
+        textSize: 24,
+        textColor: Colors.grey,
+      ).aligment(Alignment.centerLeft),
+      View(
+        child: Icon(Icons.add),
+      )
+          .corner(both: 10)
+          .backgroundColor(HexColor("#EBEEF4"))
+          .size(width: View.MATCH, height: 96)
+          .margin(top: 16)
+          .click(() {}),
+    ]);
   }
 
-  @override
-  String dataTips() {
-    // TODO: implement dataTips
-    return "请选择日期";
-  }
-
-  @override
-  bool dataVaild() {
-    return true;
-  }
-
-  @override
-  void saveData() => _state.saveData();
-}
-
-class _DateTimeWidgetState extends State<DateTimeWidget> {
-  final DateTime dateTime;
-  final BuildTagBloc _tagBloc;
-
-  _DateTimeWidgetState(this.dateTime, this._tagBloc);
-
-  CalendarWidget _calendarWidget;
-
-  TimeSelectView _timeSelectView;
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    _calendarWidget = CalendarWidget(time: dateTime);
-    _timeSelectView = TimeSelectView(dateTime: dateTime);
-  }
-
-  /// 保存用户最后选中的日期
-  void saveData() {
-    var selectDate = _calendarWidget.getSelectDate();
-    DateTime finalSelectDate = DateTime(
-        selectDate.year,
-        selectDate.month,
-        selectDate.day,
-        _timeSelectView.getSelectHour(),
-        _timeSelectView.getSelectMin());
-    _tagBloc.selectDate(finalSelectDate);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: View(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[_calendarWidget, _timeSelectView],
+  Widget getConfirmButton() {
+    return SizedBox(
+      width: double.infinity,
+      height: DP.get(70),
+      child: RaisedButton.icon(
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(DP.get(12)))),
+        icon: Icon(Icons.add_circle, color: Colors.white30),
+        color: HexColor("#13547a"),
+        label: TextView(
+          "创建",
+          textColor: Colors.white,
+          textSize: 24,
         ),
+        onPressed: () {},
       ),
     );
+  }
+
+  Widget getCategoryItem() {
+    return Column(children: <Widget>[
+      TextView(
+        "标签 (最多三个)",
+        textSize: 24,
+        textColor: Colors.grey,
+      ).aligment(Alignment.centerLeft),
+      View(
+        child: Icon(Icons.add),
+      )
+          .corner(both: 10)
+          .backgroundColor(HexColor("#EBEEF4"))
+          .size(width: View.MATCH, height: 96)
+          .margin(top: 16)
+          .click(() {}),
+    ]);
   }
 }

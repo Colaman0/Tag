@@ -24,7 +24,7 @@ class _WBTextState extends State<WBText> {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (_, box) {
-        if (IsExpansion(content, box)) {
+        if (IsExpansion(content, box, SP.get(20), 3)) {
           return AnimatedContainer(
               duration: Duration(seconds: 1),
               child: Column(
@@ -32,13 +32,18 @@ class _WBTextState extends State<WBText> {
                 children: <Widget>[
                   expand
                       ? Text(content,
-                          softWrap: true, style: TextStyle(color: Colors.black, fontSize: SP.get(20)))
+                          softWrap: true,
+                          style: TextStyle(
+                              color: Colors.black, fontSize: SP.get(20)))
                       : Text(content,
                           maxLines: 3,
                           overflow: TextOverflow.ellipsis,
-                          style: TextStyle(color: Colors.black, fontSize: SP.get(20))),
+                          style: TextStyle(
+                              color: Colors.black, fontSize: SP.get(20))),
                   View(
-                    child: Icon(expand ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down),
+                    child: Icon(expand
+                        ? Icons.keyboard_arrow_up
+                        : Icons.keyboard_arrow_down),
                   ).size(width: 48, height: 48).click(() {
                     setState(() {
                       expand = !expand;
@@ -56,14 +61,5 @@ class _WBTextState extends State<WBText> {
         }
       },
     );
-  }
-
-  bool IsExpansion(String text, BoxConstraints constraints) {
-    TextPainter _textPainter = TextPainter(
-        maxLines: 3,
-        text: TextSpan(text: text, style: TextStyle(color: Colors.black, fontSize: SP.get(20))),
-        textDirection: TextDirection.ltr)
-      ..layout(maxWidth: constraints.maxWidth, minWidth: constraints.minWidth);
-    return _textPainter.didExceedMaxLines;
   }
 }

@@ -1,9 +1,13 @@
+import 'dart:async';
+import 'dart:collection';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 import 'package:tag/route/BuildFlagRoute.dart';
 import 'package:tag/route/BuildTagRoute.dart';
 import 'package:tag/route/LoginRoute.dart';
+import 'package:tag/route/SelectDateRoute.dart';
 import 'package:tag/route/SplashRoute.dart';
 import 'package:tag/route/main/MainPage.dart';
 
@@ -26,6 +30,7 @@ class NavigatorUtils {
     "/buildTag": (BuildContext context) => BuildTagRoute(
           buildType: BuildTagRoute.TAG,
         ),
+    "/selectDate": (BuildContext context) => SelectDateRoute(),
   };
 
   NavigatorUtils._();
@@ -62,5 +67,13 @@ class NavigatorUtils {
     Navigator.of(context).pushNamed("/buildTag").whenComplete(() {
       FlutterStatusbarcolor.setStatusBarWhiteForeground(false);
     });
+  }
+
+  Future<Object> toSelectDate(BuildContext context, DateTime dateTime) {
+    HashMap<String, dynamic> hashMap = HashMap();
+    hashMap.putIfAbsent(SelectDateRoute.CREATE_DATE, () {
+      return dateTime;
+    });
+    return Navigator.of(context).pushNamed("/selectDate", arguments: hashMap);
   }
 }

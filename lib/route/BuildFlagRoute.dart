@@ -8,6 +8,7 @@ import 'package:tag/entity/Constants.dart';
 import 'package:tag/imp/basePage.dart';
 import 'package:tag/util/util.dart';
 import 'package:tag/view/flag/EditContent.dart';
+import 'package:tag/view/flag/EditContentWidget.dart';
 import 'package:tag/view/flag/SelectFlagBg.dart';
 import 'package:tag/view/widget/BuildLineWidget.dart';
 import 'package:tag/view/widget/CalendarWidget.dart';
@@ -36,7 +37,7 @@ class BuildFlagRoute extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     pages.add(CalendarWidget());
-    pages.add(SelectFlagBg());
+    pages.add(EditFlagContentWidget());
     pages.add(EditContent());
 
     return  Scaffold(

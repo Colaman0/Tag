@@ -99,11 +99,11 @@ class CalendarWidget extends StatelessWidget with BasePage {
                           }),
                       SizedBox(
                         width: double.infinity,
-                        height: 1,
+                        height: DP.get(32),
                       ),
                       Divider(color: Colors.grey),
                       AspectRatio(
-                        aspectRatio: 1.05,
+                        aspectRatio: 1,
                         child: Container(
                           alignment: Alignment.topCenter,
                           child: pageView,
@@ -149,6 +149,12 @@ class CalendarWidget extends StatelessWidget with BasePage {
   @override
   void saveData() {
     // TODO: implement saveData
+  }
+
+  @override
+  String getFunctionTitle() {
+    // TODO: implement getFunctionTitle
+    return "选择时间";
   }
 }
 
@@ -242,13 +248,13 @@ class _MonthPageState extends State<MonthPage>
   }
 
   List<Widget> getWeekTitles() => [
-        Expanded(child: TextView("一")),
-        Expanded(child: TextView("二")),
-        Expanded(child: TextView("三")),
-        Expanded(child: TextView("四")),
-        Expanded(child: TextView("五")),
-        Expanded(child: TextView("六")),
-        Expanded(child: TextView("日")),
+        Expanded(child: TextView("一",textSize: 24,)),
+        Expanded(child: TextView("二",textSize: 24,)),
+        Expanded(child: TextView("三",textSize: 24,)),
+        Expanded(child: TextView("四",textSize: 24,)),
+        Expanded(child: TextView("五",textSize: 24,)),
+        Expanded(child: TextView("六",textSize: 24,)),
+        Expanded(child: TextView("日",textSize: 24,)),
       ];
 
   @override
