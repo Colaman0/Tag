@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:tag/base/bloc.dart';
 import 'package:tag/bloc/BuildTagBloc.dart';
@@ -19,13 +20,6 @@ class BuildTagRoute extends StatelessWidget {
 
   BuildTagBloc _tagBloc = BuildTagBloc();
   BuildContext _context;
-
-  PublishSubject pageStream = PublishSubject<int>();
-
-  PageController _pageController = PageController();
-  List<Widget> pages = List();
-
-  Color mainColor = HexColor("#FBDDCA");
 
   BuildTagRoute({this.buildType});
 
@@ -80,7 +74,7 @@ class BuildTagRoute extends StatelessWidget {
                       cursorColor: Colors.white70,
                       maxLines: 1,
                       maxLength: 10,
-                      autofocus: true,
+                      autofocus: false,
                       decoration: InputDecoration(
                           focusedBorder: UnderlineInputBorder(
                               borderSide: BorderSide(
@@ -97,17 +91,26 @@ class BuildTagRoute extends StatelessWidget {
                   ),
                   Expanded(
                     child: View(
-                      child: Column(
-                        children: <Widget>[
-                          getDateItem(),
-                          getTimeItem(),
-                          getBackgroundItem(),
-                          getCategoryItem(),
-                          Spacer(),
-                          getConfirmButton()
-                        ],
-                      ),
-                    )
+                            child: Column(
+                      children: <Widget>[
+                        Expanded(
+                          child: SingleChildScrollView(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                getDateItem(),
+                                getTimeItem(),
+                                getCategoryItem(),
+                                SizedBox(
+                                  height: DP.get(32),
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
+                        getConfirmButton()
+                      ],
+                    ))
                         .padding(both: 32)
                         .size(width: View.MATCH, height: View.MATCH)
                         .corner(leftTop: 30, rightTop: 30)
@@ -259,20 +262,58 @@ class BuildTagRoute extends StatelessWidget {
   }
 
   Widget getCategoryItem() {
-    return Column(children: <Widget>[
-      TextView(
-        "标签 (最多三个)",
-        textSize: 24,
-        textColor: Colors.grey,
-      ).aligment(Alignment.centerLeft),
-      View(
-        child: Icon(Icons.add),
-      )
-          .corner(both: 10)
-          .backgroundColor(HexColor("#EBEEF4"))
-          .size(width: View.MATCH, height: 96)
-          .margin(top: 16)
-          .click(() {}),
-    ]);
+    return Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          View(
+            child: Row(children: <Widget>[
+              TextView(
+                "标签 (最多三个)",
+                textSize: 24,
+                textColor: Colors.grey,
+              ).aligment(Alignment.centerLeft),
+              Spacer(),
+              Icon(Icons.add)
+            ]),
+          ).padding(top: 12, bottom: 12).click(() {}),
+          StreamBuilder<List<String>>(
+            initialData: [
+              "one",
+              "two",
+              "three",
+              "1231",
+              "qweqweqw",
+              "dsgasgas"
+            ],
+            stream: _tagBloc.getTagsStream(),
+            builder: (context, data) {
+              List<Widget> children = data.data
+                  .map((tagName) => getCategoryTagItem(tagName))
+                  .toList();
+              return Wrap(
+                runAlignment: WrapAlignment.start,
+                children: children,
+                spacing: DP.get(16),
+              );
+            },
+          )
+        ]);
+  }
+
+  Widget getCategoryTagItem(String name) {
+    return Chip(
+        deleteButtonTooltipMessage: "移除",
+        backgroundColor: HexColor(Constants.MAIN_COLOR),
+        onDeleted: () {},
+        deleteIcon: View(
+            child: Icon(
+          Icons.close,
+          color: Colors.white,
+          size: DP.get(24),
+        )),
+        label: Text(name,
+            style: TextView.getDefaultStyle(
+                fontSize: SP.get(22), textColor: Colors.white)));
   }
 }

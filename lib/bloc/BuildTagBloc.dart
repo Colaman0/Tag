@@ -4,9 +4,14 @@ import 'package:tag/base/bloc.dart';
 class BuildTagBloc extends BlocBase {
   PublishSubject<String> _currentFuntion = PublishSubject();
   PublishSubject<int> _currentTime = PublishSubject();
+  /// 选中的日期
   PublishSubject<DateTime> _selectDateStream = PublishSubject();
+  /// 标签
+  PublishSubject<List<String>> _TagsStream = PublishSubject();
 
   PublishSubject<String> getFuntionStrStream() => _currentFuntion;
+
+  PublishSubject<List<String>> getTagsStream() => _TagsStream;
 
   PublishSubject<int> getSelectTimeStream() => _currentTime;
 
