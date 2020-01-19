@@ -11,15 +11,16 @@ import 'package:tag/util/util.dart';
 import 'package:tag/view/widget/view/TextView.dart';
 import 'package:tag/view/widget/view/View.dart';
 
-class CalendarWidget extends StatelessWidget with BasePage {
-  CalendarWidget({Key key, this.time}) : super(key: key);
+class CalendarWidget extends StatelessWidget {
+  CalendarWidget({Key key, this.time, this.selectCallback}) : super(key: key);
 
   static final CAN_WATCH_YEAR = 3;
   static final startIndex = CAN_WATCH_YEAR * 12;
   PageController _controller = new PageController(initialPage: startIndex);
-  int _lastPageIndex;
   final DateTime time;
-  CalendarBloc _bloc = CalendarBloc();
+  final Function selectCallback;
+  CalendarBloc _bloc;
+
   HashMap<int, MonthPage> monthPages = HashMap();
 
   // 获取选中的日期 年月日
@@ -27,91 +28,84 @@ class CalendarWidget extends StatelessWidget with BasePage {
 
   @override
   Widget build(BuildContext context) {
+    _bloc = CalendarBloc(selectCallback);
     _bloc.setCreateDate(time);
     PageView pageView = getPageView();
     return BlocProvider(
         bloc: _bloc,
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            View(
-              child: Padding(
-                  padding: EdgeInsets.all(DP.get(8)),
-                  child: Column(
-                    children: <Widget>[
-                      StreamBuilder<DateTime>(
-                          stream: _bloc.getcurrentShowMonthTimeStream(),
-                          initialData: time,
-                          builder: (context, data) {
-                            DateTime currentShowMonth = data.data;
-                            return View(
-                              child: new Row(
-                                children: <Widget>[
-                                  new Baseline(
-                                    baseline: 50.0,
-                                    baselineType: TextBaseline.alphabetic,
-                                    child: new Text(
-                                      '${currentShowMonth.year}',
-                                      style: new TextStyle(
-                                        fontSize: 35.0,
-                                        color: HexColor(Constants.COLOR_BLUE),
-                                        textBaseline: TextBaseline.alphabetic,
-                                      ),
-                                    ),
-                                  ),
-                                  new Baseline(
-                                    baseline: 50.0,
-                                    baselineType: TextBaseline.alphabetic,
-                                    child: new Text(
-                                      ' 年 ',
-                                      style: new TextStyle(
-                                        fontSize: 20.0,
-                                        textBaseline: TextBaseline.alphabetic,
-                                      ),
-                                    ),
-                                  ),
-                                  new Baseline(
-                                    baseline: 50.0,
-                                    baselineType: TextBaseline.alphabetic,
-                                    child: new Text(
-                                      '${currentShowMonth.month}',
-                                      style: new TextStyle(
-                                        fontSize: 35.0,
-                                        color: HexColor(Constants.COLOR_BLUE),
-                                        textBaseline: TextBaseline.alphabetic,
-                                      ),
-                                    ),
-                                  ),
-                                  new Baseline(
-                                    baseline: 50.0,
-                                    baselineType: TextBaseline.alphabetic,
-                                    child: new Text(
-                                      ' 月',
-                                      style: new TextStyle(
-                                        fontSize: 20.0,
-                                        textBaseline: TextBaseline.alphabetic,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          }),
-                      SizedBox(
-                        width: double.infinity,
-                        height: DP.get(32),
-                      ),
-                      Divider(color: Colors.grey),
-                      AspectRatio(
-                        aspectRatio: 1,
-                        child: Container(
-                          alignment: Alignment.topCenter,
-                          child: pageView,
+            StreamBuilder<DateTime>(
+                stream: _bloc.getcurrentShowMonthTimeStream(),
+                initialData: time,
+                builder: (context, data) {
+                  DateTime currentShowMonth = data.data;
+                  return View(
+                    child: new Row(
+                      children: <Widget>[
+                        new Baseline(
+                          baseline: 50.0,
+                          baselineType: TextBaseline.alphabetic,
+                          child: new Text(
+                            '${currentShowMonth.year}',
+                            style: new TextStyle(
+                              fontSize: 35.0,
+                              color: HexColor(Constants.COLOR_BLUE),
+                              textBaseline: TextBaseline.alphabetic,
+                            ),
+                          ),
                         ),
-                      ),
-                    ],
-                  )),
-            ).corner(both: 8).margin(both: 16)
+                        new Baseline(
+                          baseline: 50.0,
+                          baselineType: TextBaseline.alphabetic,
+                          child: new Text(
+                            ' 年 ',
+                            style: new TextStyle(
+                              fontSize: 20.0,
+                              textBaseline: TextBaseline.alphabetic,
+                            ),
+                          ),
+                        ),
+                        new Baseline(
+                          baseline: 50.0,
+                          baselineType: TextBaseline.alphabetic,
+                          child: new Text(
+                            '${currentShowMonth.month}',
+                            style: new TextStyle(
+                              fontSize: 35.0,
+                              color: HexColor(Constants.COLOR_BLUE),
+                              textBaseline: TextBaseline.alphabetic,
+                            ),
+                          ),
+                        ),
+                        new Baseline(
+                          baseline: 50.0,
+                          baselineType: TextBaseline.alphabetic,
+                          child: new Text(
+                            ' 月',
+                            style: new TextStyle(
+                              fontSize: 20.0,
+                              textBaseline: TextBaseline.alphabetic,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ).margin(left: 24);
+                }),
+            SizedBox(
+              width: double.infinity,
+              height: DP.get(32),
+            ),
+            Divider(color: Colors.grey),
+            AspectRatio(
+              aspectRatio: 1,
+              child: Container(
+                alignment: Alignment.topCenter,
+                child: pageView,
+              ),
+            ),
           ],
         ));
   }
@@ -122,7 +116,6 @@ class CalendarWidget extends StatelessWidget with BasePage {
       physics: AlwaysScrollableScrollPhysics(),
       itemCount: CAN_WATCH_YEAR * 12 * 2,
       onPageChanged: (pageIndex) {
-        _lastPageIndex = pageIndex;
         _bloc
             .getcurrentShowMonthTimeStream()
             .add(monthPages[pageIndex].getCurrentMonthTime());
@@ -136,26 +129,6 @@ class CalendarWidget extends StatelessWidget with BasePage {
         monthPages.putIfAbsent(index, () => page);
         return page;
       });
-
-  @override
-  bool dataVaild() => true;
-
-  @override
-  String dataTips() {
-    // TODO: implement dataTips
-    return "";
-  }
-
-  @override
-  void saveData() {
-    // TODO: implement saveData
-  }
-
-  @override
-  String getFunctionTitle() {
-    // TODO: implement getFunctionTitle
-    return "选择时间";
-  }
 }
 
 class MonthPage extends StatefulWidget {
@@ -248,13 +221,41 @@ class _MonthPageState extends State<MonthPage>
   }
 
   List<Widget> getWeekTitles() => [
-        Expanded(child: TextView("一",textSize: 24,)),
-        Expanded(child: TextView("二",textSize: 24,)),
-        Expanded(child: TextView("三",textSize: 24,)),
-        Expanded(child: TextView("四",textSize: 24,)),
-        Expanded(child: TextView("五",textSize: 24,)),
-        Expanded(child: TextView("六",textSize: 24,)),
-        Expanded(child: TextView("日",textSize: 24,)),
+        Expanded(
+            child: TextView(
+          "一",
+          textSize: 24,
+        )),
+        Expanded(
+            child: TextView(
+          "二",
+          textSize: 24,
+        )),
+        Expanded(
+            child: TextView(
+          "三",
+          textSize: 24,
+        )),
+        Expanded(
+            child: TextView(
+          "四",
+          textSize: 24,
+        )),
+        Expanded(
+            child: TextView(
+          "五",
+          textSize: 24,
+        )),
+        Expanded(
+            child: TextView(
+          "六",
+          textSize: 24,
+        )),
+        Expanded(
+            child: TextView(
+          "日",
+          textSize: 24,
+        )),
       ];
 
   @override

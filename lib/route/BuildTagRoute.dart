@@ -1,12 +1,13 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:rxdart/rxdart.dart';
 import 'package:tag/base/bloc.dart';
 import 'package:tag/bloc/BuildTagBloc.dart';
 import 'package:tag/entity/Constants.dart';
-import 'package:tag/util/NaigatorUtils.dart';
 import 'package:tag/util/util.dart';
+import 'package:tag/view/tag/SearchCategoryRoute.dart';
+import 'package:tag/view/widget/CalendarWidget.dart';
+import 'package:tag/view/widget/CategroyItemWidget.dart';
 import 'package:tag/view/widget/TimeSelectWidget.dart';
 import 'package:tag/view/widget/view/TextView.dart';
 import 'package:tag/view/widget/view/View.dart';
@@ -41,8 +42,8 @@ class BuildTagRoute extends StatelessWidget {
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: <Color>[
-                    HexColor("#13547a"),
-                    HexColor("#80d0c7")
+                    HexColor("#537895"),
+                    HexColor("#868f96")
                   ])),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -162,11 +163,49 @@ class BuildTagRoute extends StatelessWidget {
         ],
       ),
     ).click(() {
-      NavigatorUtils.getInstance().toSelectDate(_context, time).then((date) {
-        if (date != null) {
-          _tagBloc.getSelectDateStream().add(date);
-        }
-      });
+      showBottomSheet(
+          context: _context,
+          backgroundColor: Colors.black38,
+          builder: (context) {
+            DateTime time = _tagBloc.getSelectDate();
+            return Container(
+                width: double.infinity,
+                height: double.infinity,
+                alignment: Alignment.bottomCenter,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: <Widget>[
+                    View(
+                      child: CalendarWidget(
+                          time: time ?? _createTime,
+                          selectCallback: (date) {
+                            time = date;
+                          }),
+                    )
+                        .backgroundColor(Colors.white)
+                        .corner(rightTop: 20, leftTop: 20),
+                    SizedBox(
+                      width: double.infinity,
+                      height: DP.get(70),
+                      child: RaisedButton(
+                        child: TextView(
+                          "确定",
+                          textColor: Colors.white,
+                          textSize: 24,
+                        ),
+                        color: HexColor("#13547a"),
+                        onPressed: () {
+                          if (!time.isAtSameMomentAs(
+                              _tagBloc.getSelectDate() ?? _createTime)) {
+                            _tagBloc.selectDate(time);
+                          }
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    )
+                  ],
+                ));
+          });
     });
   }
 
@@ -209,7 +248,7 @@ class BuildTagRoute extends StatelessWidget {
         ],
       ),
     ).margin(top: 32, bottom: 32).click(() {
-      PersistentBottomSheetController controller = showBottomSheet(
+      showBottomSheet(
           context: _context,
           backgroundColor: Colors.black38,
           builder: (context) {
@@ -262,58 +301,47 @@ class BuildTagRoute extends StatelessWidget {
   }
 
   Widget getCategoryItem() {
-    return Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          View(
-            child: Row(children: <Widget>[
-              TextView(
-                "标签 (最多三个)",
-                textSize: 24,
-                textColor: Colors.grey,
-              ).aligment(Alignment.centerLeft),
-              Spacer(),
-              Icon(Icons.add)
-            ]),
-          ).padding(top: 12, bottom: 12).click(() {}),
-          StreamBuilder<List<String>>(
-            initialData: [
-              "one",
-              "two",
-              "three",
-              "1231",
-              "qweqweqw",
-              "dsgasgas"
-            ],
-            stream: _tagBloc.getTagsStream(),
-            builder: (context, data) {
-              List<Widget> children = data.data
-                  .map((tagName) => getCategoryTagItem(tagName))
-                  .toList();
-              return Wrap(
-                runAlignment: WrapAlignment.start,
-                children: children,
-                spacing: DP.get(16),
-              );
-            },
-          )
-        ]);
-  }
-
-  Widget getCategoryTagItem(String name) {
-    return Chip(
-        deleteButtonTooltipMessage: "移除",
-        backgroundColor: HexColor(Constants.MAIN_COLOR),
-        onDeleted: () {},
-        deleteIcon: View(
-            child: Icon(
-          Icons.close,
-          color: Colors.white,
-          size: DP.get(24),
-        )),
-        label: Text(name,
-            style: TextView.getDefaultStyle(
-                fontSize: SP.get(22), textColor: Colors.white)));
+    return StreamBuilder<List<String>>(
+        initialData: ["1123", "32131", "23151"],
+        stream: _tagBloc.getTagsStream(),
+        builder: (context, data) {
+          ///  把标签list转换成对应的chip控件显示
+          List<Widget> children = data.data
+              .map((tagName) => CategoryItemWidget(
+                    clickAble: true,
+                    removeAble: true,
+                    name: tagName,
+                    removeCallback: (name) => _tagBloc.removeCategoryItem(name),
+                  ))
+              .toList();
+          return Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                View(
+                  child: Row(children: <Widget>[
+                    TextView(
+                      "标签 (最多三个)",
+                      textSize: 24,
+                      textColor: Colors.grey,
+                    ).aligment(Alignment.centerLeft),
+                    Spacer(),
+                    Icon(Icons.add)
+                  ]),
+                ).padding(top: 12, bottom: 12).click(() {
+                  int maxSize = 3 - children.length;
+                  if (maxSize == 0) {
+                    return;
+                  }
+                  showSearch(
+                      context: _context, delegate: CategorySearch(maxSize));
+                }),
+                Wrap(
+                  runAlignment: WrapAlignment.start,
+                  children: children,
+                  spacing: DP.get(16),
+                ),
+              ]);
+        });
   }
 }

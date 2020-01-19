@@ -93,7 +93,7 @@ class TimeSelectView extends StatelessWidget {
       ),
     )
         .padding(bottom: 32)
-        .backgroundColorStr("#3282b8")
+        .backgroundColorStr("#13547a")
         .size(width: View.MATCH, height: 220);
   }
 

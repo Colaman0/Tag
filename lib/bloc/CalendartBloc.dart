@@ -8,6 +8,10 @@ class CalendarBloc extends BlocBase {
   DateTime _createDate;
   DateTime _selectDate;
 
+  final Function selectCallback;
+
+  CalendarBloc(this.selectCallback);
+
   @override
   void dispose() {
     _selectDateStream.close();
@@ -30,6 +34,9 @@ class CalendarBloc extends BlocBase {
     _selectDate = DateTime(
         time.year, time.month, time.day, _createDate.hour, _createDate.minute);
     _selectDateStream.add(time);
+    if (selectCallback != null) {
+      selectCallback(_selectDate);
+    }
   }
 
   DateTime getSelectDate() => _selectDate;
