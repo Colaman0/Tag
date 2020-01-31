@@ -8,7 +8,7 @@ class BuildTagBloc extends BlocBase {
   /// 选中的日期
   PublishSubject<DateTime> _selectDateStream = PublishSubject();
 
-  static List<String> _addCategoryTags = ["1123", "32131", "23151"];
+  static Set<String> _addCategoryTags = Set();
 
   /// 标签
   PublishSubject<List<String>> _tagsStream = PublishSubject();
@@ -22,10 +22,6 @@ class BuildTagBloc extends BlocBase {
   PublishSubject<DateTime> getSelectDateStream() => _selectDateStream;
   DateTime _selectDateTime;
 
-  BuildTagBloc() {
-    _tagsStream.doOnData((tags) => _addCategoryTags = tags);
-  }
-
   void selectDate(DateTime dateTime) {
     getSelectDateStream().add(dateTime);
     _selectDateTime = dateTime;
@@ -35,12 +31,15 @@ class BuildTagBloc extends BlocBase {
 
   /// 添加分类标签
   void addCategoryItem(List<String> items) {
-    getTagsStream().add(items);
+    if(items!=null && items.isNotEmpty) {
+      _addCategoryTags.addAll(items.toSet());
+      getTagsStream().add(_addCategoryTags.toList());
+    }
   }
 
   void removeCategoryItem(String name) {
     _addCategoryTags.remove(name);
-    getTagsStream().add(_addCategoryTags);
+    getTagsStream().add(_addCategoryTags.toList());
   }
 
   @override

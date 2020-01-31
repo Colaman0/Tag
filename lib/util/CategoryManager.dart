@@ -11,6 +11,6 @@ class CategoryManager {
   }
 
   Future<List<String>> getAllCategory() async {
-    return ["1", "2", "3", "4", "5", "6", "7", "8"];
+    return ["1", "12", "123", "1234", "12345", "123456", "1234567", "12345678"];
   }
 }

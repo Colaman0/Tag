@@ -302,18 +302,21 @@ class BuildTagRoute extends StatelessWidget {
 
   Widget getCategoryItem() {
     return StreamBuilder<List<String>>(
-        initialData: ["1123", "32131", "23151"],
         stream: _tagBloc.getTagsStream(),
         builder: (context, data) {
           ///  把标签list转换成对应的chip控件显示
-          List<Widget> children = data.data
-              .map((tagName) => CategoryItemWidget(
-                    clickAble: true,
-                    removeAble: true,
-                    name: tagName,
-                    removeCallback: (name) => _tagBloc.removeCategoryItem(name),
-                  ))
-              .toList();
+          List<Widget> children;
+          if (data.data != null) {
+            children = data.data
+                .map((tagName) => CategoryItemWidget(
+                      clickAble: true,
+                      removeAble: true,
+                      name: tagName,
+                      removeCallback: (name) =>
+                          _tagBloc.removeCategoryItem(name),
+                    ))
+                .toList();
+          }
           return Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -329,16 +332,25 @@ class BuildTagRoute extends StatelessWidget {
                     Icon(Icons.add)
                   ]),
                 ).padding(top: 12, bottom: 12).click(() {
-                  int maxSize = 3 - children.length;
+                  int maxSize = 3 - (children?.length ?? 0);
                   if (maxSize == 0) {
                     return;
                   }
                   showSearch(
-                      context: _context, delegate: CategorySearch(maxSize));
+                          context: _context, delegate: CategorySearch(maxSize))
+                      .then((results) {
+                    if (results is Iterable && results.isNotEmpty) {
+                      List<String> tags = [];
+                      results.forEach((tag) {
+                        tags.add(tag);
+                      });
+                      _tagBloc.addCategoryItem(tags);
+                    }
+                  });
                 }),
                 Wrap(
                   runAlignment: WrapAlignment.start,
-                  children: children,
+                  children: children ?? [],
                   spacing: DP.get(16),
                 ),
               ]);
