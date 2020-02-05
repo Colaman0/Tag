@@ -45,7 +45,6 @@ class TextView extends View {
   static getDefaultStyle({double fontSize, Color textColor}) {
     return GoogleFonts.rubik(
         textStyle: TextStyle(
-
             color: textColor ?? Colors.black,
             fontSize: fontSize ?? SP.get(18),
             decoration: TextDecoration.none));

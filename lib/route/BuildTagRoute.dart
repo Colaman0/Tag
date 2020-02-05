@@ -1,9 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:tag/base/bloc.dart';
 import 'package:tag/bloc/BuildTagBloc.dart';
 import 'package:tag/entity/Constants.dart';
+import 'package:tag/util/NaigatorUtils.dart';
 import 'package:tag/util/util.dart';
 import 'package:tag/view/tag/SearchCategoryRoute.dart';
 import 'package:tag/view/widget/CalendarWidget.dart';
@@ -26,9 +28,12 @@ class BuildTagRoute extends StatelessWidget {
 
   DateTime _createTime;
 
+  String _flagTitle;
+
   @override
   Widget build(BuildContext context) {
     _createTime = DateTime.now();
+    _tagBloc.selectDate(_createTime);
     return BlocProvider(
         bloc: _tagBloc,
         child: Scaffold(body: Builder(
@@ -70,6 +75,7 @@ class BuildTagRoute extends StatelessWidget {
                       child: Material(
                     color: Colors.transparent,
                     child: TextField(
+                      onChanged: (name) => _flagTitle = name,
                       style:
                           TextStyle(color: Colors.white, fontSize: SP.get(28)),
                       cursorColor: Colors.white70,
@@ -109,7 +115,7 @@ class BuildTagRoute extends StatelessWidget {
                             ),
                           ),
                         ),
-                        getConfirmButton()
+                        getConfirmButton(context)
                       ],
                     ))
                         .padding(both: 32)
@@ -168,6 +174,7 @@ class BuildTagRoute extends StatelessWidget {
           backgroundColor: Colors.black38,
           builder: (context) {
             DateTime time = _tagBloc.getSelectDate();
+
             return Container(
                 width: double.infinity,
                 height: double.infinity,
@@ -195,10 +202,7 @@ class BuildTagRoute extends StatelessWidget {
                         ),
                         color: HexColor("#13547a"),
                         onPressed: () {
-                          if (!time.isAtSameMomentAs(
-                              _tagBloc.getSelectDate() ?? _createTime)) {
-                            _tagBloc.selectDate(time);
-                          }
+                          _tagBloc.selectDate(time);
                           Navigator.of(context).pop();
                         },
                       ),
@@ -257,7 +261,7 @@ class BuildTagRoute extends StatelessWidget {
               height: double.infinity,
               alignment: Alignment.bottomCenter,
               child: TimeSelectView(
-                  dateTime: time, timeStream: _tagBloc.getSelectDateStream()),
+                  dateTime: time, tagBloc: _tagBloc),
             );
           });
     });
@@ -281,7 +285,7 @@ class BuildTagRoute extends StatelessWidget {
     ]);
   }
 
-  Widget getConfirmButton() {
+  Widget getConfirmButton(BuildContext context) {
     return SizedBox(
       width: double.infinity,
       height: DP.get(70),
@@ -295,7 +299,14 @@ class BuildTagRoute extends StatelessWidget {
           textColor: Colors.white,
           textSize: 24,
         ),
-        onPressed: () {},
+        onPressed: () {
+          if (_flagTitle == null || _flagTitle.isEmpty) {
+            Fluttertoast.showToast(msg: "标题不能为空");
+          } else {
+            NavigatorUtils.getInstance()
+                .toFlagBg(context, _flagTitle, _tagBloc.getSelectDate());
+          }
+        },
       ),
     );
   }

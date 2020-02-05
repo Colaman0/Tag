@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:tag/bloc/BuildTagBloc.dart';
 import 'package:tag/util/util.dart';
 import 'package:tag/view/widget/view/TextView.dart';
 import 'package:tag/view/widget/view/View.dart';
@@ -20,12 +21,12 @@ class TimeSelectView extends StatelessWidget {
 
   PublishSubject<int> hourItemStream = PublishSubject();
   PublishSubject<int> minItemStream = PublishSubject();
-  PublishSubject<DateTime> timeStream;
+  BuildTagBloc tagBloc;
 
   int selectHour, selectMin;
 
-  TimeSelectView({Key key, this.dateTime, this.timeStream}) : super(key: key) {
-    for (int i = 1; i < 24; i++) {
+  TimeSelectView({Key key, this.dateTime, this.tagBloc}) : super(key: key) {
+    for (int i = 0; i < 24; i++) {
       hours.add(i);
     }
     for (int i = 0; i < 60; i++) {
@@ -33,11 +34,11 @@ class TimeSelectView extends StatelessWidget {
     }
 
     _hourController =
-        FixedExtentScrollController(initialItem: dateTime.hour - 1);
+        FixedExtentScrollController(initialItem: dateTime.hour );
     _minController = FixedExtentScrollController(initialItem: dateTime.minute);
   }
 
-  int getSelectHour() => ++selectHour;
+  int getSelectHour() => selectHour;
 
   int getSelectMin() => selectMin;
 
@@ -62,8 +63,8 @@ class TimeSelectView extends StatelessWidget {
                 textSize: 22,
                 textColor: Colors.white,
               ).padding(top: 12, bottom: 12, left: 24, right: 24).click(() {
-                timeStream.add(DateTime(dateTime.year, dateTime.month,
-                    dateTime.day, selectHour + 1, selectMin));
+                tagBloc.selectDate(DateTime(dateTime.year, dateTime.month,
+                    dateTime.day, getSelectHour(), getSelectMin()));
                 Navigator.of(context).pop();
               }),
             ]),
@@ -105,16 +106,15 @@ class TimeSelectView extends StatelessWidget {
         childDelegate: ListWheelChildListDelegate(
           children: hours.map((value) {
             return StreamBuilder<int>(
-                initialData: dateTime.hour - 1,
+                initialData: dateTime.hour ,
                 stream: hourItemStream,
                 builder: (context, data) {
                   selectHour = data.data;
                   return TextView(
                     value.toString().padLeft(2, '0'),
-                    textSize: (value - 1) == data.data ? 35 : 25,
-                    textColor: (value - 1) == data.data
-                        ? Colors.white
-                        : Colors.white70,
+                    textSize: (value) == data.data ? 35 : 25,
+                    textColor:
+                        (value) == data.data ? Colors.white : Colors.white70,
                   );
                 });
           }).toList(),

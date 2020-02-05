@@ -23,8 +23,8 @@ class BuildTagBloc extends BlocBase {
   DateTime _selectDateTime;
 
   void selectDate(DateTime dateTime) {
-    getSelectDateStream().add(dateTime);
     _selectDateTime = dateTime;
+    getSelectDateStream().add(dateTime);
   }
 
   DateTime getSelectDate() => _selectDateTime;

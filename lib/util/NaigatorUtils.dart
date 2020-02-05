@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 import 'package:tag/route/BuildFlagRoute.dart';
 import 'package:tag/route/BuildTagRoute.dart';
+import 'package:tag/route/FlagBackgroundRoute.dart';
 import 'package:tag/route/LoginRoute.dart';
 import 'package:tag/route/SelectDateRoute.dart';
 import 'package:tag/route/SplashRoute.dart';
@@ -31,6 +32,7 @@ class NavigatorUtils {
           buildType: BuildTagRoute.TAG,
         ),
     "/selectDate": (BuildContext context) => SelectDateRoute(),
+    "/flagBg": (BuildContext context) => FlagBackgroundRoute(),
   };
 
   NavigatorUtils._();
@@ -75,5 +77,16 @@ class NavigatorUtils {
       return dateTime;
     });
     return Navigator.of(context).pushNamed("/selectDate", arguments: hashMap);
+  }
+
+  void toFlagBg(BuildContext context, String name, DateTime time) {
+    HashMap<String, dynamic> hashMap = HashMap();
+    hashMap.putIfAbsent(FlagBackgroundRoute.FLAG_NAME, () {
+      return name;
+    });
+    hashMap.putIfAbsent(FlagBackgroundRoute.FLAG_DATE, () {
+      return time;
+    });
+    Navigator.of(context).pushNamed("/flagBg", arguments: hashMap);
   }
 }
