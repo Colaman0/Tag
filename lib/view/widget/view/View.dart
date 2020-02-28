@@ -112,8 +112,8 @@ class View extends StatelessWidget {
           alignment: childAlignment,
           padding: _padding?.getParams() ?? _defalut,
           margin: _margin?.getParams() ?? _defalut,
-          width: DP.get(_width),
-          height: DP.get(_height),
+          width: DP.toDouble(_width),
+          height: DP.toDouble(_height),
           child: initChild());
     } else if (!isDpValue(_width) && isDpValue(_height)) {
       if (_width == View.MATCH) {
@@ -122,14 +122,14 @@ class View extends StatelessWidget {
             padding: _padding?.getParams() ?? _defalut,
             margin: _margin?.getParams() ?? _defalut,
             width: double.infinity,
-            height: DP.get(_height),
+            height: DP.toDouble(_height),
             child: initChild());
       } else {
         body = Container(
           alignment: childAlignment,
           padding: _padding?.getParams() ?? _defalut,
           margin: _margin?.getParams() ?? _defalut,
-          height: DP.get(_height),
+          height: DP.toDouble(_height),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -145,7 +145,7 @@ class View extends StatelessWidget {
           margin: _margin?.getParams() ?? _defalut,
           alignment: childAlignment,
           height: double.infinity,
-          width: DP.get(_width),
+          width: DP.toDouble(_width),
           child: initChild(),
         );
       } else {
@@ -153,7 +153,7 @@ class View extends StatelessWidget {
           padding: _padding?.getParams() ?? _defalut,
           margin: _margin?.getParams() ?? _defalut,
           alignment: childAlignment,
-          width: DP.get(_width),
+          width: DP.toDouble(_width),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -230,7 +230,7 @@ class View extends StatelessWidget {
 
   View storke({String color, int width}) {
     _storkeColor = HexColor(color);
-    _storkeWidth = DP.get(width);
+    _storkeWidth = DP.toDouble(width);
     return this;
   }
 
@@ -251,16 +251,16 @@ class View extends StatelessWidget {
     if (_circleShpae) {
       return null;
     }
-    var bothRadius = DP.get(_bothRadius);
+    var bothRadius = DP.toDouble(_bothRadius);
     return BorderRadius.only(
       topLeft:
-          Radius.circular(_leftTop == null ? bothRadius : DP.get(_leftTop)),
+          Radius.circular(_leftTop == null ? bothRadius : DP.toDouble(_leftTop)),
       topRight:
-          Radius.circular(_rightTop == null ? bothRadius : DP.get(_rightTop)),
+          Radius.circular(_rightTop == null ? bothRadius : DP.toDouble(_rightTop)),
       bottomLeft: Radius.circular(
-          _leftBottom == null ? bothRadius : DP.get(_leftBottom)),
+          _leftBottom == null ? bothRadius : DP.toDouble(_leftBottom)),
       bottomRight: Radius.circular(
-          _rightBottom == null ? bothRadius : DP.get(_rightBottom)),
+          _rightBottom == null ? bothRadius : DP.toDouble(_rightBottom)),
     );
   }
 

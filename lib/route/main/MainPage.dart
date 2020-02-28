@@ -55,7 +55,7 @@ class _MainPageState extends State<MainPage> {
                   child: Row(
                     children: <Widget>[
                       IconButton(
-                        padding: EdgeInsets.all(DP.get(16)),
+                        padding: EdgeInsets.all(DP.toDouble(16)),
                         icon: Icon(
                           Icons.home,
                           color: snap.data == 0

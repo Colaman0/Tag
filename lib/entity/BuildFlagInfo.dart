@@ -8,13 +8,15 @@ class BuildFlagInfo {
   final DateTime date;
   File backgroundImage;
   String colorStr = "#80000000";
+  List<String> categories;
 
   BuildFlagInfo(
       {this.flagName,
       this.date,
       this.backgroundType,
       this.backgroundImage,
-      this.colorStr});
+      this.colorStr,
+      this.categories});
 
   /// 设置背景图片file
   void setImage(File file) {

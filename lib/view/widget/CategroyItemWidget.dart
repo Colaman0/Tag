@@ -29,7 +29,7 @@ class CategoryItemWidget extends StatelessWidget with SelectItem {
       builder: (context, data) {
         return GestureDetector(
           child: Chip(
-              padding: EdgeInsets.all(DP.get(8)),
+              padding: EdgeInsets.all(DP.toDouble(8)),
               deleteButtonTooltipMessage: "移除",
               backgroundColor: getCurrentSelectStatus()
                   ? HexColor("#00adb5")
@@ -46,7 +46,7 @@ class CategoryItemWidget extends StatelessWidget with SelectItem {
                       child: Icon(
                       Icons.close,
                       color: Colors.white,
-                      size: DP.get(28),
+                      size: DP.toDouble(28),
                     ))
                   : null,
               label: Text(name,

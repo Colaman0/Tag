@@ -73,7 +73,7 @@ class CategorySearch extends SearchDelegate {
         }
 
         return Container(
-          padding: EdgeInsets.all(DP.get(32)),
+          padding: EdgeInsets.all(DP.toDouble(32)),
           child: Column(
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.start,
@@ -82,7 +82,7 @@ class CategorySearch extends SearchDelegate {
                 Wrap(
                   runAlignment: WrapAlignment.start,
                   children: items ?? [],
-                  spacing: DP.get(16),
+                  spacing: DP.toDouble(16),
                 ),
                 Spacer(),
                 getConfirmButton(context)
@@ -95,10 +95,10 @@ class CategorySearch extends SearchDelegate {
   Widget getConfirmButton(BuildContext context) {
     return SizedBox(
       width: double.infinity,
-      height: DP.get(70),
+      height: DP.toDouble(70),
       child: RaisedButton.icon(
         shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(DP.get(12)))),
+            borderRadius: BorderRadius.all(Radius.circular(DP.toDouble(12)))),
         color: HexColor("#13547a"),
         icon: Container(),
         label: TextView(

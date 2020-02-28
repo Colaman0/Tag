@@ -61,7 +61,7 @@ class _TouchRadioState extends State<RadioButtoin> {
             icon: Icon(
               icon,
               color: color,
-              size: DP.get(8),
+              size: DP.toDouble(8),
             ),
             onPressed: () {
               setState(() {

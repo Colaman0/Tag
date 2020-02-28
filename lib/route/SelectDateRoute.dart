@@ -26,14 +26,14 @@ class SelectDateRoute extends StatelessWidget {
           ),
           Spacer(),
           Container(
-              margin: EdgeInsets.all(DP.get(32)),
+              margin: EdgeInsets.all(DP.toDouble(32)),
               child: SizedBox(
                 width: double.infinity,
-                height: DP.get(70),
+                height: DP.toDouble(70),
                 child: RaisedButton.icon(
                   shape: RoundedRectangleBorder(
                       borderRadius:
-                          BorderRadius.all(Radius.circular(DP.get(12)))),
+                          BorderRadius.all(Radius.circular(DP.toDouble(12)))),
                   icon: Icon(Icons.calendar_today, color: Colors.white30),
                   color: HexColor("#13547a"),
                   label: TextView(
@@ -47,7 +47,7 @@ class SelectDateRoute extends StatelessWidget {
                 ),
               )),
           SizedBox(
-            height: DP.get(32),
+            height: DP.toDouble(32),
           )
         ],
       ),

@@ -96,7 +96,7 @@ class CalendarWidget extends StatelessWidget {
                 }),
             SizedBox(
               width: double.infinity,
-              height: DP.get(32),
+              height: DP.toDouble(32),
             ),
             Divider(color: Colors.grey),
             AspectRatio(

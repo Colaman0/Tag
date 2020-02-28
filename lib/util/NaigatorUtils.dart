@@ -4,6 +4,8 @@ import 'dart:collection';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
+import 'package:tag/entity/BuildTagInfo.dart';
+import 'package:tag/entity/Constants.dart';
 import 'package:tag/route/BuildFlagRoute.dart';
 import 'package:tag/route/BuildTagRoute.dart';
 import 'package:tag/route/FlagBackgroundRoute.dart';
@@ -25,12 +27,8 @@ class NavigatorUtils {
     "/": (BuildContext context) => SplashRoute(),
     "/login": (BuildContext context) => LoginRoute(),
     "/main": (BuildContext context) => MainPage(),
-    "/buildFlag": (BuildContext context) => BuildTagRoute(
-          buildType: BuildTagRoute.FLAG,
-        ),
-    "/buildTag": (BuildContext context) => BuildTagRoute(
-          buildType: BuildTagRoute.TAG,
-        ),
+    "/buildFlag": (BuildContext context) => BuildFlagRoute(),
+    "/buildTag": (BuildContext context) => BuildTagRoute(),
     "/selectDate": (BuildContext context) => SelectDateRoute(),
     "/flagBg": (BuildContext context) => FlagBackgroundRoute(),
   };
@@ -64,11 +62,21 @@ class NavigatorUtils {
     Navigator.of(context).pushNamed("/buildFlag");
   }
 
-  void toBuildTag(BuildContext context) {
-    FlutterStatusbarcolor.setStatusBarWhiteForeground(true);
-    Navigator.of(context).pushNamed("/buildTag").whenComplete(() {
-      FlutterStatusbarcolor.setStatusBarWhiteForeground(false);
-    });
+  void toBuildTag(BuildContext context, {BuildTagInfo buildTagInfo}) {
+    buildTagInfo = BuildTagInfo(
+        tagName: "去超市", date: DateTime.now(), todos: ["买可乐", "买猪肉和牛肉", "买几盒蛋糕和草莓，蛋糕要巧克力的，草莓要奶油的🍓"]);
+    if (buildTagInfo != null) {
+      HashMap<String, dynamic> hashMap = HashMap();
+      hashMap.putIfAbsent(Constants.DATA, () {
+        return buildTagInfo;
+      });
+      FlutterStatusbarcolor.setStatusBarWhiteForeground(true);
+      Navigator.of(context)
+          .pushNamed("/buildTag", arguments: hashMap)
+          .whenComplete(() {
+        FlutterStatusbarcolor.setStatusBarWhiteForeground(false);
+      });
+    }
   }
 
   Future<Object> toSelectDate(BuildContext context, DateTime dateTime) {

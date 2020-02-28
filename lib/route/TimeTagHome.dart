@@ -22,7 +22,7 @@ class _TimeTagRouteState extends State<TimeTagRoute> {
         alignment: Alignment.center,
         children: <Widget>[
           Positioned(
-              top: DP.get(32),
+              top: DP.toDouble(32),
               child: Text("下一个 Tag",
                   softWrap: false,
                   style: GoogleFonts.rubik(
@@ -40,10 +40,10 @@ class _TimeTagRouteState extends State<TimeTagRoute> {
                     child: LayoutBuilder(
                       builder: (builder, box) {
                         double fontSize = calculateAutoscaleFontSize(text,
-                            GoogleFonts.rubik(), 20, box.maxWidth - DP.get(64));
+                            GoogleFonts.rubik(), 20, box.maxWidth - DP.toDouble(64));
                         return Container(
                           margin: EdgeInsets.only(
-                              left: DP.get(32), right: DP.get(32)),
+                              left: DP.toDouble(32), right: DP.toDouble(32)),
                           child: Baseline(
                             child: Text(text,
                                 softWrap: false,
@@ -53,7 +53,7 @@ class _TimeTagRouteState extends State<TimeTagRoute> {
                                       fontSize: fontSize),
                                 )),
                             baselineType: TextBaseline.alphabetic,
-                            baseline: DP.get(128),
+                            baseline: DP.toDouble(128),
                           ),
                         );
                       },
@@ -67,7 +67,7 @@ class _TimeTagRouteState extends State<TimeTagRoute> {
                               color: HexColor(Constants.MAIN_COLOR),
                               fontSize: 40),
                         )),
-                    baseline: DP.get(128),
+                    baseline: DP.toDouble(128),
                     baselineType: TextBaseline.alphabetic,
                   )).margin(right: 32).backgroundColor(Colors.white)
                 ],

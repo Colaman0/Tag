@@ -73,7 +73,7 @@ class FlagBackgroundRoute extends StatelessWidget {
             icon: Icon(
               Icons.arrow_back,
               color: Colors.white,
-              size: DP.get(36),
+              size: DP.toDouble(36),
             ),
             onPressed: () {
               Navigator.of(_context).pop();
@@ -95,7 +95,7 @@ class FlagBackgroundRoute extends StatelessWidget {
     return Positioned(
         left: 0,
         right: 0,
-        bottom: DP.get(240),
+        bottom: DP.toDouble(240),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
@@ -104,7 +104,7 @@ class FlagBackgroundRoute extends StatelessWidget {
               color: Colors.white,
             ),
             SizedBox(
-              width: DP.get(8),
+              width: DP.toDouble(8),
             ),
             Text(
               "${info.date.year}年${info.date.month}月${info.date.day}日${info.date.hour}时${info.date.minute}分",
@@ -125,7 +125,7 @@ class FlagBackgroundRoute extends StatelessWidget {
     return Positioned(
         left: 0,
         right: 0,
-        top: DP.get(240),
+        top: DP.toDouble(240),
         child: Container(
           alignment: Alignment.center,
           child: Text(
@@ -154,7 +154,7 @@ class FlagBackgroundRoute extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 new Baseline(
-                  baseline: DP.get(28),
+                  baseline: DP.toDouble(28),
                   baselineType: TextBaseline.alphabetic,
                   child: new Text(
                     "${nowTime.difference(info.date).inDays.abs()}",
@@ -202,14 +202,14 @@ class FlagBackgroundRoute extends StatelessWidget {
       right: 0,
       child: Container(
         width: double.infinity,
-        height: DP.get(80),
+        height: DP.toDouble(80),
         color: Colors.black12,
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
             children: <Widget>[
               SizedBox(
-                width: DP.get(8),
+                width: DP.toDouble(8),
               ),
               IconButton(
                 icon: Icon(Icons.add_circle),
@@ -283,10 +283,10 @@ class FlagBackgroundRoute extends StatelessWidget {
   Widget getColorBox(String color) {
     return GestureDetector(
       child: Container(
-        margin: EdgeInsets.all(DP.get(8)),
+        margin: EdgeInsets.all(DP.toDouble(8)),
         color: HexColor(color),
-        width: DP.get(58),
-        height: DP.get(58),
+        width: DP.toDouble(58),
+        height: DP.toDouble(58),
       ),
       onTap: () {
         backgroundStream.add(BuildFlagInfo(
@@ -359,7 +359,7 @@ List<Widget> getFlagContentWidgets(BuildFlagInfo info,
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           new Baseline(
-            baseline: DP.get(28),
+            baseline: DP.toDouble(28),
             baselineType: TextBaseline.alphabetic,
             child: new Text(
               "${nowTime.difference(info.date).inDays.abs()}",
@@ -389,7 +389,7 @@ List<Widget> getFlagContentWidgets(BuildFlagInfo info,
     Positioned(
         left: 0,
         right: 0,
-        top: DP.get(240),
+        top: DP.toDouble(240),
         child: Container(
           alignment: Alignment.center,
           child: Text(
@@ -404,7 +404,7 @@ List<Widget> getFlagContentWidgets(BuildFlagInfo info,
     Positioned(
         left: 0,
         right: 0,
-        bottom: DP.get(240),
+        bottom: DP.toDouble(240),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
@@ -413,7 +413,7 @@ List<Widget> getFlagContentWidgets(BuildFlagInfo info,
               color: Colors.white,
             ),
             SizedBox(
-              width: DP.get(8),
+              width: DP.toDouble(8),
             ),
             Text(
               "${info.date.year}年${info.date.month}月${info.date.day}日${info.date.hour}时${info.date.minute}分",

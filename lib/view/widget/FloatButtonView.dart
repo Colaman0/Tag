@@ -15,7 +15,7 @@ class FloatButtonView extends StatelessWidget {
       stream: _visibleStream,
       builder: (context, snap) {
         _isExpand = snap.data;
-        double size = _isExpand ? DP.get(64) : 0;
+        double size = _isExpand ? DP.toDouble(64) : 0;
         return  Column(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[

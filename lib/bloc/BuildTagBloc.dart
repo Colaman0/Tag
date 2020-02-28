@@ -1,5 +1,6 @@
 import 'package:rxdart/rxdart.dart';
 import 'package:tag/base/bloc.dart';
+import 'package:tag/entity/BuildTagInfo.dart';
 
 class BuildTagBloc extends BlocBase {
   PublishSubject<String> _currentFuntion = PublishSubject();
@@ -7,6 +8,7 @@ class BuildTagBloc extends BlocBase {
 
   /// 选中的日期
   PublishSubject<DateTime> _selectDateStream = PublishSubject();
+  PublishSubject<List<String>> _todoList = PublishSubject();
 
   static Set<String> _addCategoryTags = Set();
 
@@ -20,18 +22,42 @@ class BuildTagBloc extends BlocBase {
   PublishSubject<int> getSelectTimeStream() => _currentTime;
 
   PublishSubject<DateTime> getSelectDateStream() => _selectDateStream;
+
+  PublishSubject<List<String>> getTodoListStream() => _todoList;
+
+  List<String> getTodoList() => _todoLists;
+
   DateTime _selectDateTime;
+
+  String _tagName;
+
+  List<String> _todoLists = List();
+
+  /// 设置初始数据
+  void initData(BuildTagInfo info) {
+    if (info != null) {
+      selectDate(info.date);
+      setTodoList(info.todos);
+      _tagName = info.tagName;
+    }
+  }
 
   void selectDate(DateTime dateTime) {
     _selectDateTime = dateTime;
     getSelectDateStream().add(dateTime);
   }
 
+  String getTagName() => _tagName;
+
+  void setTagName(String name) {
+    _tagName = name;
+  }
+
   DateTime getSelectDate() => _selectDateTime;
 
   /// 添加分类标签
   void addCategoryItem(List<String> items) {
-    if(items!=null && items.isNotEmpty) {
+    if (items != null && items.isNotEmpty) {
       _addCategoryTags.addAll(items.toSet());
       getTagsStream().add(_addCategoryTags.toList());
     }
@@ -40,6 +66,16 @@ class BuildTagBloc extends BlocBase {
   void removeCategoryItem(String name) {
     _addCategoryTags.remove(name);
     getTagsStream().add(_addCategoryTags.toList());
+  }
+
+  /// 设置todolist内容
+  void setTodoList(List<String> todoList) {
+    if (todoList == null) {
+      return;
+    }
+    _todoList.add(todoList);
+    _todoLists.clear();
+    _todoLists.addAll(todoList);
   }
 
   @override

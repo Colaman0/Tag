@@ -21,11 +21,11 @@ class TimeSelectView extends StatelessWidget {
 
   PublishSubject<int> hourItemStream = PublishSubject();
   PublishSubject<int> minItemStream = PublishSubject();
-  BuildTagBloc tagBloc;
+  Function selectTimeFun ;
 
   int selectHour, selectMin;
 
-  TimeSelectView({Key key, this.dateTime, this.tagBloc}) : super(key: key) {
+  TimeSelectView({Key key, this.dateTime,this.selectTimeFun }) : super(key: key) {
     for (int i = 0; i < 24; i++) {
       hours.add(i);
     }
@@ -63,7 +63,7 @@ class TimeSelectView extends StatelessWidget {
                 textSize: 22,
                 textColor: Colors.white,
               ).padding(top: 12, bottom: 12, left: 24, right: 24).click(() {
-                tagBloc.selectDate(DateTime(dateTime.year, dateTime.month,
+                selectTimeFun(DateTime(dateTime.year, dateTime.month,
                     dateTime.day, getSelectHour(), getSelectMin()));
                 Navigator.of(context).pop();
               }),
@@ -72,7 +72,7 @@ class TimeSelectView extends StatelessWidget {
           Container(
             color: Colors.white,
             height: 0.1,
-            margin: EdgeInsets.only(bottom: DP.get(8)),
+            margin: EdgeInsets.only(bottom: DP.toDouble(8)),
           ),
           Expanded(
               child: Row(

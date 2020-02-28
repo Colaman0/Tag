@@ -4,9 +4,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:tag/base/bloc.dart';
 import 'package:tag/bloc/BuildTagBloc.dart';
+import 'package:tag/entity/BuildTagInfo.dart';
 import 'package:tag/entity/Constants.dart';
 import 'package:tag/util/NaigatorUtils.dart';
 import 'package:tag/util/util.dart';
+import 'package:tag/view/tag/AddTodoListWidget.dart';
 import 'package:tag/view/tag/SearchCategoryRoute.dart';
 import 'package:tag/view/widget/CalendarWidget.dart';
 import 'package:tag/view/widget/CategroyItemWidget.dart';
@@ -28,18 +30,19 @@ class BuildTagRoute extends StatelessWidget {
 
   DateTime _createTime;
 
-  String _flagTitle;
+  TextEditingController _editingController = TextEditingController();
+
+  BuildTagInfo _initInfo = BuildTagInfo(
+      tagName: "去超市", date: DateTime.now(), todos: ["1", "2", "3"]);
 
   @override
   Widget build(BuildContext context) {
-    _createTime = DateTime.now();
-    _tagBloc.selectDate(_createTime);
+    initData(context);
     return BlocProvider(
         bloc: _tagBloc,
         child: Scaffold(body: Builder(
           builder: (BuildContext context) {
             _context = context;
-
             return Container(
               padding: EdgeInsets.only(top: ScreenUtil.statusBarHeight),
               decoration: BoxDecoration(
@@ -55,27 +58,26 @@ class BuildTagRoute extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  View(
-                    child: Icon(Icons.arrow_back,
-                        size: DP.get(48), color: Colors.white),
-                  ).size(width: 64, height: 64).click(() {
-                    Navigator.of(context).pop();
-                  }),
-                  TextView(
-                    "Create",
-                    textSize: 40,
-                    textColor: Colors.white,
-                  ).aligment(Alignment.centerLeft).margin(left: 16, top: 12),
-                  TextView(
-                    "New Flag",
-                    textSize: 40,
-                    textColor: Colors.white,
-                  ).aligment(Alignment.centerLeft).margin(left: 16, top: 4),
+                  Row(
+                    children: <Widget>[
+                      View(
+                        child: Icon(Icons.arrow_back,
+                            size: DP.toDouble(48), color: Colors.white),
+                      ).size(width: 64, height: 64).click(() {
+                        Navigator.of(context).pop();
+                      }),
+                      TextView(
+                        "Create New Tag",
+                        textSize: 30,
+                        textColor: Colors.white,
+                      ).aligment(Alignment.centerLeft).margin(left: 16),
+                    ],
+                  ),
                   View(
                       child: Material(
                     color: Colors.transparent,
                     child: TextField(
-                      onChanged: (name) => _flagTitle = name,
+                      onChanged: (name) => _tagBloc.setTagName(name),
                       style:
                           TextStyle(color: Colors.white, fontSize: SP.get(28)),
                       cursorColor: Colors.white70,
@@ -94,7 +96,7 @@ class BuildTagRoute extends StatelessWidget {
                     ),
                   )).margin(left: 16, right: 16, top: 16),
                   SizedBox(
-                    height: DP.get(24),
+                    height: DP.toDouble(24),
                   ),
                   Expanded(
                     child: View(
@@ -103,14 +105,12 @@ class BuildTagRoute extends StatelessWidget {
                         Expanded(
                           child: SingleChildScrollView(
                             child: Column(
+                              mainAxisSize: MainAxisSize.max,
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
                                 getDateItem(),
                                 getTimeItem(),
-                                getCategoryItem(),
-                                SizedBox(
-                                  height: DP.get(32),
-                                )
+                                getTodoListItem(),
                               ],
                             ),
                           ),
@@ -130,6 +130,161 @@ class BuildTagRoute extends StatelessWidget {
         )));
   }
 
+  /// 初始化数据
+  void initData(BuildContext context) {
+    Map arguments = NavigatorUtils.getPreArguments(context);
+    if (arguments != null && arguments[Constants.DATA] != null) {
+      // 把初始数据放到bloc中
+      _tagBloc.initData(arguments[Constants.DATA]);
+      // 设置初始的Tag名字
+      _editingController.value = TextEditingValue(text: _tagBloc.getTagName());
+    }
+  }
+
+  /// 获取清单列表的UI
+  Widget getTodoListItem() {
+    return View(
+        child: StreamBuilder<List<String>>(
+            initialData: _tagBloc.getTodoList(),
+            stream: _tagBloc.getTodoListStream(),
+            builder: (context, data) {
+              List<Widget> childs = [
+                View(
+                  child: Row(
+                    children: <Widget>[
+                      TextView(
+                        "清单",
+                        textSize: 28,
+                        textColor: Colors.white,
+                      ),
+                      Spacer(),
+                      Icon(
+                        Icons.format_list_bulleted,
+                        color: Colors.white,
+                      )
+                    ],
+                  ),
+                ).padding(both: 8).corner(both: 8).backgroundColorStr("#537895")
+              ];
+
+              childs.add(Divider(
+                color: Colors.transparent,
+              ));
+
+              /// 把对应的清单item内容转换为文字展示
+              data.data.forEach((todoContent) {
+                childs.add(Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    View(child: Icon(Icons.remove, size: DP.toDouble(16)))
+                        .margin(top: 10),
+                    Expanded(
+                      child: TextView(
+                        todoContent ?? "",
+                        textSize: 24,
+                      ).aligment(Alignment.centerLeft),
+                    )
+                  ],
+                ));
+                childs.add(Divider());
+              });
+
+              return Column(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: childs,
+              );
+            })).margin(top: 16).padding(top: 8, bottom: 8).click(() {
+      showAddTodoListUI();
+    });
+  }
+
+  Widget add;
+
+  /// 展示一个底部弹窗用于编辑todolist
+  void showAddTodoListUI() {
+    AddTodoListWidget todoWidget =
+        AddTodoListWidget(initTodos: _tagBloc.getTodoList());
+
+    showModalBottomSheet(
+        context: _context,
+        isDismissible: false,
+        backgroundColor: Colors.transparent,
+        builder: (context) {
+          if (add == null) {
+            add = View(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  View(
+                    child: Stack(
+                      children: <Widget>[
+                        Positioned(
+                          left: 0,
+                          right: 0,
+                          top: 0,
+                          bottom: 0,
+                          child: TextView(
+                            "清单",
+                            textColor: Colors.white,
+                            textSize: SP.get(30).toInt(),
+                          ),
+                        ),
+                        Positioned(
+                          child: IconButton(
+                            onPressed: () {
+                              /// 关闭清单UI之后，拿到新的清单数据
+                              _tagBloc.setTodoList(todoWidget.getTodos());
+                              Navigator.of(_context).pop();
+                            },
+                            icon: Icon(
+                              Icons.close,
+                              color: Colors.white,
+                              size: 30,
+                            ),
+                          ),
+                          left: 0,
+                          top: 0,
+                          bottom: 0,
+                        ),
+                        Positioned(
+                          child: IconButton(
+                            onPressed: () {
+                              todoWidget.addNewItem();
+                            },
+                            icon: Icon(
+                              Icons.add,
+                              color: Colors.white,
+                              size: 30,
+                            ),
+                          ),
+                          right: 0,
+                          top: 0,
+                          bottom: 0,
+                        )
+                      ],
+                    ),
+                  )
+                      .size(width: View.MATCH, height: DP.toInt(80))
+                      .corner(leftTop: 20, rightTop: 20)
+                      .backgroundColorStr(Constants.COLOR_BLUE),
+                  Expanded(
+                    child: todoWidget,
+                  )
+                ],
+              ),
+            )
+                .aligment(Alignment.topCenter)
+                .size(height: 900, width: View.MATCH)
+                .corner(leftTop: 20, rightTop: 20)
+                .backgroundColor(Colors.white);
+          }
+          return add;
+        });
+  }
+
+  /// 获取一个展示日期的widget
   Widget getDateItem() {
     DateTime time;
     return View(
@@ -141,7 +296,7 @@ class BuildTagRoute extends StatelessWidget {
             textColor: Colors.grey,
           ).aligment(Alignment.centerLeft),
           StreamBuilder<DateTime>(
-              initialData: _createTime,
+              initialData: _tagBloc.getSelectDate(),
               stream: _tagBloc.getSelectDateStream(),
               builder: (context, data) {
                 time = data.data;
@@ -157,7 +312,7 @@ class BuildTagRoute extends StatelessWidget {
                     ),
                     Icon(
                       Icons.calendar_today,
-                      size: DP.get(24),
+                      size: DP.toDouble(24),
                       color: HexColor("#313B79"),
                     )
                   ],
@@ -169,6 +324,7 @@ class BuildTagRoute extends StatelessWidget {
         ],
       ),
     ).click(() {
+      /// 弹出一个底部弹窗用于选择日期
       showBottomSheet(
           context: _context,
           backgroundColor: Colors.black38,
@@ -193,7 +349,7 @@ class BuildTagRoute extends StatelessWidget {
                         .corner(rightTop: 20, leftTop: 20),
                     SizedBox(
                       width: double.infinity,
-                      height: DP.get(70),
+                      height: DP.toDouble(70),
                       child: RaisedButton(
                         child: TextView(
                           "确定",
@@ -213,6 +369,7 @@ class BuildTagRoute extends StatelessWidget {
     });
   }
 
+  /// 获取一个关于时间的widget，点击选择时间(时&分)
   Widget getTimeItem() {
     DateTime time;
     return View(
@@ -224,7 +381,7 @@ class BuildTagRoute extends StatelessWidget {
             textColor: Colors.grey,
           ).aligment(Alignment.centerLeft),
           StreamBuilder<DateTime>(
-              initialData: _createTime,
+              initialData: _tagBloc.getSelectDate(),
               stream: _tagBloc.getSelectDateStream(),
               builder: (context, data) {
                 time = data.data;
@@ -240,7 +397,7 @@ class BuildTagRoute extends StatelessWidget {
                     ),
                     Icon(
                       Icons.timelapse,
-                      size: DP.get(24),
+                      size: DP.toDouble(24),
                       color: HexColor("#313B79"),
                     )
                   ],
@@ -251,7 +408,7 @@ class BuildTagRoute extends StatelessWidget {
           )
         ],
       ),
-    ).margin(top: 32, bottom: 32).click(() {
+    ).margin(top: 32, bottom: 16).click(() {
       showBottomSheet(
           context: _context,
           backgroundColor: Colors.black38,
@@ -261,37 +418,21 @@ class BuildTagRoute extends StatelessWidget {
               height: double.infinity,
               alignment: Alignment.bottomCenter,
               child: TimeSelectView(
-                  dateTime: time, tagBloc: _tagBloc),
+                  dateTime: time,
+                  selectTimeFun: (time) => _tagBloc.selectDate(time())),
             );
           });
     });
   }
 
-  Widget getBackgroundItem() {
-    return Column(children: <Widget>[
-      TextView(
-        "背景图",
-        textSize: 24,
-        textColor: Colors.grey,
-      ).aligment(Alignment.centerLeft),
-      View(
-        child: Icon(Icons.add),
-      )
-          .corner(both: 10)
-          .backgroundColor(HexColor("#EBEEF4"))
-          .size(width: View.MATCH, height: 96)
-          .margin(top: 16)
-          .click(() {}),
-    ]);
-  }
-
+  /// 获取一个确认按钮，点击后创建一个 Tag
   Widget getConfirmButton(BuildContext context) {
     return SizedBox(
       width: double.infinity,
-      height: DP.get(70),
+      height: DP.toDouble(70),
       child: RaisedButton.icon(
         shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(DP.get(12)))),
+            borderRadius: BorderRadius.all(Radius.circular(DP.toDouble(12)))),
         icon: Icon(Icons.add_circle, color: Colors.white30),
         color: HexColor("#13547a"),
         label: TextView(
@@ -300,17 +441,18 @@ class BuildTagRoute extends StatelessWidget {
           textSize: 24,
         ),
         onPressed: () {
-          if (_flagTitle == null || _flagTitle.isEmpty) {
+          if (_tagBloc.getTagName() == null || _tagBloc.getTagName().isEmpty) {
             Fluttertoast.showToast(msg: "标题不能为空");
           } else {
-            NavigatorUtils.getInstance()
-                .toFlagBg(context, _flagTitle, _tagBloc.getSelectDate());
+            NavigatorUtils.getInstance().toFlagBg(
+                context, _tagBloc.getTagName(), _tagBloc.getSelectDate());
           }
         },
       ),
     );
   }
 
+  /// 获取分类的widget，点击跳转搜索添加分类标签
   Widget getCategoryItem() {
     return StreamBuilder<List<String>>(
         stream: _tagBloc.getTagsStream(),
@@ -362,7 +504,7 @@ class BuildTagRoute extends StatelessWidget {
                 Wrap(
                   runAlignment: WrapAlignment.start,
                   children: children ?? [],
-                  spacing: DP.get(16),
+                  spacing: DP.toDouble(16),
                 ),
               ]);
         });

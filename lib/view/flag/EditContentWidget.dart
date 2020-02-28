@@ -10,7 +10,7 @@ class EditFlagContentWidget extends StatelessWidget with BasePage {
   Widget build(BuildContext context) {
     return Center(
       child: Container(
-        margin: EdgeInsets.all(DP.get(32)),
+        margin: EdgeInsets.all(DP.toDouble(32)),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,

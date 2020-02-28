@@ -25,7 +25,7 @@ class SelectFlagBg extends StatelessWidget with BasePage {
             child: data.data == null
                 ? Icon(
               Icons.add,
-              size: DP.get(64),
+              size: DP.toDouble(64),
               color: HexColor(Constants.MAIN_COLOR),
             )
                 : Stack(
