@@ -177,8 +177,8 @@ class BuildTagRoute extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    View(child: Icon(Icons.remove, size: DP.toDouble(16)))
-                        .margin(top: 10),
+                    View(child: Icon(Icons.brightness_1, size: DP.toDouble(16)))
+                        .margin(top: 10,right: 18),
                     Expanded(
                       child: TextView(
                         todoContent ?? "",
@@ -212,75 +212,72 @@ class BuildTagRoute extends StatelessWidget {
         isDismissible: false,
         backgroundColor: Colors.transparent,
         builder: (context) {
-          if (add == null) {
-            add = View(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  View(
-                    child: Stack(
-                      children: <Widget>[
-                        Positioned(
-                          left: 0,
-                          right: 0,
-                          top: 0,
-                          bottom: 0,
-                          child: TextView(
-                            "清单",
-                            textColor: Colors.white,
-                            textSize: SP.get(30).toInt(),
+          return View(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                View(
+                  child: Stack(
+                    children: <Widget>[
+                      Positioned(
+                        left: 0,
+                        right: 0,
+                        top: 0,
+                        bottom: 0,
+                        child: TextView(
+                          "清单",
+                          textColor: Colors.white,
+                          textSize: SP.get(30).toInt(),
+                        ),
+                      ),
+                      Positioned(
+                        child: IconButton(
+                          onPressed: () {
+                            /// 关闭清单UI之后，拿到新的清单数据
+                            _tagBloc.setTodoList(todoWidget.getTodos());
+                            Navigator.of(_context).pop();
+                          },
+                          icon: Icon(
+                            Icons.close,
+                            color: Colors.white,
+                            size: 30,
                           ),
                         ),
-                        Positioned(
-                          child: IconButton(
-                            onPressed: () {
-                              /// 关闭清单UI之后，拿到新的清单数据
-                              _tagBloc.setTodoList(todoWidget.getTodos());
-                              Navigator.of(_context).pop();
-                            },
-                            icon: Icon(
-                              Icons.close,
-                              color: Colors.white,
-                              size: 30,
-                            ),
+                        left: 0,
+                        top: 0,
+                        bottom: 0,
+                      ),
+                      Positioned(
+                        child: IconButton(
+                          onPressed: () {
+                            todoWidget.addNewItem();
+                          },
+                          icon: Icon(
+                            Icons.add,
+                            color: Colors.white,
+                            size: 30,
                           ),
-                          left: 0,
-                          top: 0,
-                          bottom: 0,
                         ),
-                        Positioned(
-                          child: IconButton(
-                            onPressed: () {
-                              todoWidget.addNewItem();
-                            },
-                            icon: Icon(
-                              Icons.add,
-                              color: Colors.white,
-                              size: 30,
-                            ),
-                          ),
-                          right: 0,
-                          top: 0,
-                          bottom: 0,
-                        )
-                      ],
-                    ),
-                  )
-                      .size(width: View.MATCH, height: DP.toInt(80))
-                      .corner(leftTop: 20, rightTop: 20)
-                      .backgroundColorStr(Constants.COLOR_BLUE),
-                  Expanded(
-                    child: todoWidget,
-                  )
-                ],
-              ),
-            )
-                .aligment(Alignment.topCenter)
-                .size(height: 900, width: View.MATCH)
-                .corner(leftTop: 20, rightTop: 20)
-                .backgroundColor(Colors.white);
-          }
-          return add;
+                        right: 0,
+                        top: 0,
+                        bottom: 0,
+                      )
+                    ],
+                  ),
+                )
+                    .size(width: View.MATCH, height: DP.toInt(80))
+                    .corner(leftTop: 20, rightTop: 20)
+                    .backgroundColorStr(Constants.COLOR_BLUE),
+                Expanded(
+                  child: todoWidget,
+                )
+              ],
+            ),
+          )
+              .aligment(Alignment.topCenter)
+              .size(height: 900, width: View.MATCH)
+              .corner(leftTop: 20, rightTop: 20)
+              .backgroundColor(Colors.white);
         });
   }
 

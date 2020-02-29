@@ -11,7 +11,7 @@ class AddTodoListWidget extends StatelessWidget {
   List<String> initTodos;
 
   /// 当前的todo list
-  List<String> currentTodos;
+  List<String> currentTodos = List();
 
   List<EditTodoListItemWidget> todoItemWidgets = List();
   Function todoCallback;
@@ -21,7 +21,6 @@ class AddTodoListWidget extends StatelessWidget {
     if (initTodos == null || initTodos.length == 0) {
       initTodos = List();
     }
-    currentTodos = initTodos;
   }
 
   FocusNode _focusNode;
@@ -34,17 +33,27 @@ class AddTodoListWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     _focusCallback = (node) {
       _focusNode = node;
+
+      ///切换焦点的时候要检查一下有没有空的item，直接删除掉空的
+      removeEmptyTodo();
     };
     return Container(
       child: GestureDetector(
         onTap: () {
           _focusNode?.unfocus();
+
+          /// 点击空白处失去焦点的时候要检查一下有没有空的item，直接删除掉空的
+          removeEmptyTodo();
         },
         child: StreamBuilder<List<String>>(
           stream: todoItemStream,
           initialData: initTodos,
           builder: (context, datas) {
+            /// 每次更新listview的内容里，把所有itemwidgets和当前todo的string内容
+            /// 清空，然后重新加进去
             todoItemWidgets.clear();
+            currentTodos.clear();
+            currentTodos.addAll(datas.data);
             return ListView.builder(
               itemCount: datas.data.length,
               itemBuilder: (context, index) {
@@ -93,10 +102,26 @@ class AddTodoListWidget extends StatelessWidget {
     return false;
   }
 
+  void removeEmptyTodo() {
+    if (currentTodos.isEmpty) {
+      return;
+    }
+    List<String> todos = List();
+    todoItemWidgets.forEach((item) => item.getTodoContent().isNotEmpty
+        ? todos.add(item.getTodoContent())
+        : null);
+    if (todos.length != currentTodos.length) {
+      todoItemStream.add(todos);
+    }
+  }
+
   void addNewItem() {
-    List<String> currentTodos = getTodos();
-    currentTodos.add("");
-    todoItemStream.add(currentTodos);
+    if (currentTodos.last == null || currentTodos.isEmpty) {
+      return;
+    }
+    List<String> todos = getTodos();
+    todos.add("");
+    todoItemStream.add(todos);
   }
 
   /// 获取当前的todo列表数据
