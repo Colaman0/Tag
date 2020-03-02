@@ -40,6 +40,9 @@ dependencies:
   google_fonts: ^0.2.0
   image_picker: ^0.6.2+3
   flutter_statusbarcolor: ^0.2.3
+  keyboard_visibility: ^0.5.2
+  keyboard_utils: ^1.1.0
+  keyboard_avoider : ^0.1.2
   flutter_custom_calendar:
     git:
       url: https://github.com/LXD312569496/flutter_custom_calendar.git

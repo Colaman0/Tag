@@ -33,8 +33,14 @@ class BuildTagBloc extends BlocBase {
 
   List<String> _todoLists = List();
 
+  bool isInit = false;
+
   /// 设置初始数据
   void initData(BuildTagInfo info) {
+    if (isInit) {
+      return;
+    }
+    isInit = true;
     if (info != null) {
       selectDate(info.date);
       setTodoList(info.todos);
@@ -73,9 +79,8 @@ class BuildTagBloc extends BlocBase {
     if (todoList == null) {
       return;
     }
+    _todoLists = todoList;
     _todoList.add(todoList);
-    _todoLists.clear();
-    _todoLists.addAll(todoList);
   }
 
   @override

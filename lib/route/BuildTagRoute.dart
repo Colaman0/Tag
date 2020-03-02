@@ -2,13 +2,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:keyboard_visibility/keyboard_visibility.dart';
 import 'package:tag/base/bloc.dart';
 import 'package:tag/bloc/BuildTagBloc.dart';
 import 'package:tag/entity/BuildTagInfo.dart';
 import 'package:tag/entity/Constants.dart';
 import 'package:tag/util/NaigatorUtils.dart';
 import 'package:tag/util/util.dart';
-import 'package:tag/view/tag/AddTodoListWidget.dart';
 import 'package:tag/view/tag/SearchCategoryRoute.dart';
 import 'package:tag/view/widget/CalendarWidget.dart';
 import 'package:tag/view/widget/CategroyItemWidget.dart';
@@ -38,96 +38,100 @@ class BuildTagRoute extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     initData(context);
+
     return BlocProvider(
-        bloc: _tagBloc,
-        child: Scaffold(body: Builder(
-          builder: (BuildContext context) {
-            _context = context;
-            return Container(
-              padding: EdgeInsets.only(top: ScreenUtil.statusBarHeight),
-              decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: <Color>[
-                    HexColor("#537895"),
-                    HexColor("#868f96")
-                  ])),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Row(
-                    children: <Widget>[
-                      View(
-                        child: Icon(Icons.arrow_back,
-                            size: DP.toDouble(48), color: Colors.white),
-                      ).size(width: 64, height: 64).click(() {
-                        Navigator.of(context).pop();
-                      }),
-                      TextView(
-                        "Create New Tag",
-                        textSize: 30,
-                        textColor: Colors.white,
-                      ).aligment(Alignment.centerLeft).margin(left: 16),
-                    ],
-                  ),
-                  View(
-                      child: Material(
-                    color: Colors.transparent,
-                    child: TextField(
-                      onChanged: (name) => _tagBloc.setTagName(name),
-                      style:
-                          TextStyle(color: Colors.white, fontSize: SP.get(28)),
-                      cursorColor: Colors.white70,
-                      maxLines: 1,
-                      maxLength: 10,
-                      autofocus: false,
-                      decoration: InputDecoration(
-                          focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(
-                                  color: HexColor(Constants.MAIN_COLOR))),
-                          hintStyle: TextStyle(color: Colors.white),
-                          hintText: "输入标题",
-                          border: UnderlineInputBorder(
-                              borderSide: BorderSide(
-                                  color: HexColor(Constants.MAIN_COLOR)))),
-                    ),
-                  )).margin(left: 16, right: 16, top: 16),
-                  SizedBox(
-                    height: DP.toDouble(24),
-                  ),
-                  Expanded(
-                    child: View(
-                            child: Column(
+      bloc: _tagBloc,
+      child: Scaffold(
+          resizeToAvoidBottomInset: false,
+          body: Builder(
+            builder: (BuildContext context) {
+              _context = context;
+              return Container(
+                padding: EdgeInsets.only(top: ScreenUtil.statusBarHeight),
+                decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: <Color>[
+                      HexColor("#537895"),
+                      HexColor("#868f96")
+                    ])),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Row(
                       children: <Widget>[
-                        Expanded(
-                          child: SingleChildScrollView(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.max,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                getDateItem(),
-                                getTimeItem(),
-                                getTodoListItem(),
-                              ],
+                        View(
+                          child: Icon(Icons.arrow_back,
+                              size: DP.toDouble(48), color: Colors.white),
+                        ).size(width: 64, height: 64).click(() {
+                          Navigator.of(context).pop();
+                        }),
+                        TextView(
+                          "Create New Tag",
+                          textSize: 30,
+                          textColor: Colors.white,
+                        ).aligment(Alignment.centerLeft).margin(left: 16),
+                      ],
+                    ),
+                    View(
+                        child: Material(
+                      color: Colors.transparent,
+                      child: TextField(
+                        onChanged: (name) => _tagBloc.setTagName(name),
+                        style: TextStyle(
+                            color: Colors.white, fontSize: SP.get(28)),
+                        cursorColor: Colors.white70,
+                        maxLines: 1,
+                        maxLength: 10,
+                        autofocus: false,
+                        decoration: InputDecoration(
+                            focusedBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(
+                                    color: HexColor(Constants.MAIN_COLOR))),
+                            hintStyle: TextStyle(color: Colors.white),
+                            hintText: "输入标题",
+                            border: UnderlineInputBorder(
+                                borderSide: BorderSide(
+                                    color: HexColor(Constants.MAIN_COLOR)))),
+                      ),
+                    )).margin(left: 16, right: 16, top: 16),
+                    SizedBox(
+                      height: DP.toDouble(24),
+                    ),
+                    Expanded(
+                      child: View(
+                              child: Column(
+                        children: <Widget>[
+                          Expanded(
+                            child: SingleChildScrollView(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.max,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  getDateItem(),
+                                  getTimeItem(),
+                                  getTodoListItem(),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                        getConfirmButton(context)
-                      ],
-                    ))
-                        .padding(both: 32)
-                        .size(width: View.MATCH, height: View.MATCH)
-                        .corner(leftTop: 30, rightTop: 30)
-                        .backgroundColor(Colors.white),
-                  )
-                ],
-              ),
-            );
-          },
-        )));
+                          getConfirmButton(context)
+                        ],
+                      ))
+                          .padding(both: 32)
+                          .size(width: View.MATCH, height: View.MATCH)
+                          .corner(leftTop: 30, rightTop: 30)
+                          .backgroundColor(Colors.white),
+                    )
+                  ],
+                ),
+              );
+            },
+          )),
+    );
   }
 
   /// 初始化数据
@@ -170,6 +174,7 @@ class BuildTagRoute extends StatelessWidget {
               childs.add(Divider(
                 color: Colors.transparent,
               ));
+              print("清单 ${data.data}");
 
               /// 把对应的清单item内容转换为文字展示
               data.data.forEach((todoContent) {
@@ -178,7 +183,7 @@ class BuildTagRoute extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     View(child: Icon(Icons.brightness_1, size: DP.toDouble(16)))
-                        .margin(top: 10,right: 18),
+                        .margin(top: 10, right: 18),
                     Expanded(
                       child: TextView(
                         todoContent ?? "",
@@ -196,89 +201,15 @@ class BuildTagRoute extends StatelessWidget {
                 children: childs,
               );
             })).margin(top: 16).padding(top: 8, bottom: 8).click(() {
-      showAddTodoListUI();
+      /// 跳转到编辑清单页面
+      NavigatorUtils.getInstance()
+          .toEditTodoList(_context, todos: _tagBloc.getTodoList())
+          .then((todos) {
+        print("Data $todos");
+        // 更新清单数据
+        _tagBloc.setTodoList(todos);
+      });
     });
-  }
-
-  Widget add;
-
-  /// 展示一个底部弹窗用于编辑todolist
-  void showAddTodoListUI() {
-    AddTodoListWidget todoWidget =
-        AddTodoListWidget(initTodos: _tagBloc.getTodoList());
-
-    showModalBottomSheet(
-        context: _context,
-        isDismissible: false,
-        backgroundColor: Colors.transparent,
-        builder: (context) {
-          return View(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                View(
-                  child: Stack(
-                    children: <Widget>[
-                      Positioned(
-                        left: 0,
-                        right: 0,
-                        top: 0,
-                        bottom: 0,
-                        child: TextView(
-                          "清单",
-                          textColor: Colors.white,
-                          textSize: SP.get(30).toInt(),
-                        ),
-                      ),
-                      Positioned(
-                        child: IconButton(
-                          onPressed: () {
-                            /// 关闭清单UI之后，拿到新的清单数据
-                            _tagBloc.setTodoList(todoWidget.getTodos());
-                            Navigator.of(_context).pop();
-                          },
-                          icon: Icon(
-                            Icons.close,
-                            color: Colors.white,
-                            size: 30,
-                          ),
-                        ),
-                        left: 0,
-                        top: 0,
-                        bottom: 0,
-                      ),
-                      Positioned(
-                        child: IconButton(
-                          onPressed: () {
-                            todoWidget.addNewItem();
-                          },
-                          icon: Icon(
-                            Icons.add,
-                            color: Colors.white,
-                            size: 30,
-                          ),
-                        ),
-                        right: 0,
-                        top: 0,
-                        bottom: 0,
-                      )
-                    ],
-                  ),
-                )
-                    .size(width: View.MATCH, height: DP.toInt(80))
-                    .corner(leftTop: 20, rightTop: 20)
-                    .backgroundColorStr(Constants.COLOR_BLUE),
-                Expanded(
-                  child: todoWidget,
-                )
-              ],
-            ),
-          )
-              .aligment(Alignment.topCenter)
-              .size(height: 900, width: View.MATCH)
-              .corner(leftTop: 20, rightTop: 20)
-              .backgroundColor(Colors.white);
-        });
   }
 
   /// 获取一个展示日期的widget
@@ -327,7 +258,6 @@ class BuildTagRoute extends StatelessWidget {
           backgroundColor: Colors.black38,
           builder: (context) {
             DateTime time = _tagBloc.getSelectDate();
-
             return Container(
                 width: double.infinity,
                 height: double.infinity,
@@ -416,7 +346,7 @@ class BuildTagRoute extends StatelessWidget {
               alignment: Alignment.bottomCenter,
               child: TimeSelectView(
                   dateTime: time,
-                  selectTimeFun: (time) => _tagBloc.selectDate(time())),
+                  selectTimeFun: (time) => _tagBloc.selectDate(time)),
             );
           });
     });

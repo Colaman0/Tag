@@ -209,6 +209,27 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "3.0.1"
+  keyboard_avoider:
+    dependency: "direct main"
+    description:
+      name: keyboard_avoider
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.1.2"
+  keyboard_utils:
+    dependency: "direct main"
+    description:
+      name: keyboard_utils
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "1.1.0"
+  keyboard_visibility:
+    dependency: "direct main"
+    description:
+      name: keyboard_visibility
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.5.6"
   matcher:
     dependency: transitive
     description:

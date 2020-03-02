@@ -8,6 +8,7 @@ import 'package:tag/entity/BuildTagInfo.dart';
 import 'package:tag/entity/Constants.dart';
 import 'package:tag/route/BuildFlagRoute.dart';
 import 'package:tag/route/BuildTagRoute.dart';
+import 'package:tag/route/EditTodoListRoute.dart';
 import 'package:tag/route/FlagBackgroundRoute.dart';
 import 'package:tag/route/LoginRoute.dart';
 import 'package:tag/route/SelectDateRoute.dart';
@@ -31,6 +32,7 @@ class NavigatorUtils {
     "/buildTag": (BuildContext context) => BuildTagRoute(),
     "/selectDate": (BuildContext context) => SelectDateRoute(),
     "/flagBg": (BuildContext context) => FlagBackgroundRoute(),
+    "/editTodo": (BuildContext context) => EditTodoListRoute(),
   };
 
   NavigatorUtils._();
@@ -64,7 +66,9 @@ class NavigatorUtils {
 
   void toBuildTag(BuildContext context, {BuildTagInfo buildTagInfo}) {
     buildTagInfo = BuildTagInfo(
-        tagName: "去超市", date: DateTime.now(), todos: ["买可乐", "买猪肉和牛肉", "买几盒蛋糕和草莓，蛋糕要巧克力的，草莓要奶油的🍓"]);
+        tagName: "去超市",
+        date: DateTime.now(),
+        todos: ["买可乐", "买猪肉和牛肉", "买几盒蛋糕和草莓，蛋糕要巧克力的，草莓要奶油的🍓"]);
     if (buildTagInfo != null) {
       HashMap<String, dynamic> hashMap = HashMap();
       hashMap.putIfAbsent(Constants.DATA, () {
@@ -79,14 +83,6 @@ class NavigatorUtils {
     }
   }
 
-  Future<Object> toSelectDate(BuildContext context, DateTime dateTime) {
-    HashMap<String, dynamic> hashMap = HashMap();
-    hashMap.putIfAbsent(SelectDateRoute.CREATE_DATE, () {
-      return dateTime;
-    });
-    return Navigator.of(context).pushNamed("/selectDate", arguments: hashMap);
-  }
-
   void toFlagBg(BuildContext context, String name, DateTime time) {
     HashMap<String, dynamic> hashMap = HashMap();
     hashMap.putIfAbsent(FlagBackgroundRoute.FLAG_NAME, () {
@@ -96,5 +92,15 @@ class NavigatorUtils {
       return time;
     });
     Navigator.of(context).pushNamed("/flagBg", arguments: hashMap);
+  }
+
+  Future<Object> toEditTodoList(BuildContext context,
+      {List<String> todos}) {
+    HashMap<String, dynamic> hashMap = HashMap();
+    hashMap.putIfAbsent(Constants.DATA, () {
+      return todos;
+    });
+    return Navigator.of(context)
+        .pushNamed("/editTodo", arguments: hashMap);
   }
 }
