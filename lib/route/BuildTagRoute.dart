@@ -2,11 +2,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:keyboard_visibility/keyboard_visibility.dart';
 import 'package:tag/base/bloc.dart';
 import 'package:tag/bloc/BuildTagBloc.dart';
 import 'package:tag/entity/BuildTagInfo.dart';
 import 'package:tag/entity/Constants.dart';
+import 'package:tag/entity/TodoEntity.dart';
 import 'package:tag/util/NaigatorUtils.dart';
 import 'package:tag/util/util.dart';
 import 'package:tag/view/tag/SearchCategoryRoute.dart';
@@ -17,23 +17,14 @@ import 'package:tag/view/widget/view/TextView.dart';
 import 'package:tag/view/widget/view/View.dart';
 
 class BuildTagRoute extends StatelessWidget {
-  static final TAG = "Tag";
-  static final FLAG = "Flag";
-
-  // build类型
-  final buildType;
-
   BuildTagBloc _tagBloc = BuildTagBloc();
   BuildContext _context;
 
-  BuildTagRoute({this.buildType});
+  BuildTagRoute();
 
   DateTime _createTime;
 
   TextEditingController _editingController = TextEditingController();
-
-  BuildTagInfo _initInfo = BuildTagInfo(
-      tagName: "去超市", date: DateTime.now(), todos: ["1", "2", "3"]);
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +61,7 @@ class BuildTagRoute extends StatelessWidget {
                           Navigator.of(context).pop();
                         }),
                         TextView(
-                          "Create New Tag",
+                          _tagBloc.isInit ? "编辑 Tag" : "创建 Tag",
                           textSize: 30,
                           textColor: Colors.white,
                         ).aligment(Alignment.centerLeft).margin(left: 16),
@@ -87,6 +78,8 @@ class BuildTagRoute extends StatelessWidget {
                         maxLines: 1,
                         maxLength: 10,
                         autofocus: false,
+                        controller: TextEditingController.fromValue(
+                            TextEditingValue(text: _tagBloc.getTagName())),
                         decoration: InputDecoration(
                             focusedBorder: UnderlineInputBorder(
                                 borderSide: BorderSide(
@@ -148,7 +141,7 @@ class BuildTagRoute extends StatelessWidget {
   /// 获取清单列表的UI
   Widget getTodoListItem() {
     return View(
-        child: StreamBuilder<List<String>>(
+        child: StreamBuilder<List<TodoEntity>>(
             initialData: _tagBloc.getTodoList(),
             stream: _tagBloc.getTodoListStream(),
             builder: (context, data) {
@@ -174,7 +167,6 @@ class BuildTagRoute extends StatelessWidget {
               childs.add(Divider(
                 color: Colors.transparent,
               ));
-              print("清单 ${data.data}");
 
               /// 把对应的清单item内容转换为文字展示
               data.data.forEach((todoContent) {
@@ -186,7 +178,7 @@ class BuildTagRoute extends StatelessWidget {
                         .margin(top: 10, right: 18),
                     Expanded(
                       child: TextView(
-                        todoContent ?? "",
+                        todoContent.todo ?? "",
                         textSize: 24,
                       ).aligment(Alignment.centerLeft),
                     )
@@ -205,7 +197,6 @@ class BuildTagRoute extends StatelessWidget {
       NavigatorUtils.getInstance()
           .toEditTodoList(_context, todos: _tagBloc.getTodoList())
           .then((todos) {
-        print("Data $todos");
         // 更新清单数据
         _tagBloc.setTodoList(todos);
       });
@@ -323,7 +314,7 @@ class BuildTagRoute extends StatelessWidget {
                       ).aligment(Alignment.centerLeft).margin(top: 12),
                     ),
                     Icon(
-                      Icons.timelapse,
+                      Icons.access_time,
                       size: DP.toDouble(24),
                       color: HexColor("#313B79"),
                     )
@@ -363,7 +354,7 @@ class BuildTagRoute extends StatelessWidget {
         icon: Icon(Icons.add_circle, color: Colors.white30),
         color: HexColor("#13547a"),
         label: TextView(
-          "创建",
+          _tagBloc.isInit ? '保存' : '创建',
           textColor: Colors.white,
           textSize: 24,
         ),
@@ -371,8 +362,13 @@ class BuildTagRoute extends StatelessWidget {
           if (_tagBloc.getTagName() == null || _tagBloc.getTagName().isEmpty) {
             Fluttertoast.showToast(msg: "标题不能为空");
           } else {
-            NavigatorUtils.getInstance().toFlagBg(
-                context, _tagBloc.getTagName(), _tagBloc.getSelectDate());
+            if (_tagBloc.isInit) {
+              Navigator.of(context).pop(_tagBloc.getTagInfo());
+              return;
+            }
+            Navigator.of(context).pop();
+            NavigatorUtils.getInstance()
+                .toTagRoute(context, _tagBloc.getTagInfo());
           }
         },
       ),

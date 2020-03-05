@@ -8,6 +8,7 @@ import 'package:tag/util/util.dart';
 import 'package:tag/view/bind/BindViewPager.dart';
 import 'package:tag/view/main/MainContentsWidget.dart';
 import 'package:tag/view/widget/CustomDialog.dart';
+import 'package:tag/view/widget/view/TextView.dart';
 import 'package:tag/view/widget/view/View.dart';
 
 import '../TimeTagHome.dart';
@@ -92,10 +93,7 @@ class _MainPageState extends State<MainPage> {
                       return SimpleDialog(
                         children: <Widget>[
                           ListTile(
-                            title: Hero(
-                              tag: BuildTagRoute.FLAG,
-                              child: Text("Flag"),
-                            ),
+                            title: Text("Flag"),
                             leading: Icon(Icons.flag),
                             subtitle: Text("记录值得纪念的时刻"),
                             onTap: () {
@@ -105,10 +103,7 @@ class _MainPageState extends State<MainPage> {
                           ),
                           Divider(),
                           ListTile(
-                            title: Hero(
-                              tag: BuildTagRoute.TAG,
-                              child: Text("Tag"),
-                            ),
+                            title: Text("Tag"),
                             leading: Icon(Icons.timelapse),
                             subtitle: Text("标记未来需要完成的Tag"),
                             onTap: () {

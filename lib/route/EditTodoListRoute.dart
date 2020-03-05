@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:tag/entity/Constants.dart';
+import 'package:tag/entity/TodoEntity.dart';
 import 'package:tag/util/NaigatorUtils.dart';
 import 'package:tag/util/util.dart';
 import 'package:tag/view/widget/view/TextView.dart';
@@ -9,10 +10,10 @@ import 'package:tag/view/widget/view/TextView.dart';
 /// 编辑Todo列表的页面
 class EditTodoListRoute extends StatelessWidget {
   /// 初始化的todo list
-  List<String> initTodos;
+  List<TodoEntity> initTodos;
 
   /// 当前的todo list
-  List<String> _todoItemStrs = List();
+  List<TodoEntity> _todoItemStrs = List();
 
   List<EditTodoListItemWidget> _todoItemWidgets = List();
 
@@ -53,9 +54,9 @@ class EditTodoListRoute extends StatelessWidget {
         child: StreamBuilder<List<EditTodoListItemWidget>>(
           initialData:
               ((NavigatorUtils.getPreArguments(context)[Constants.DATA] ?? [])
-                      as List<String>)
+                      as List<TodoEntity>)
                   .map((data) => EditTodoListItemWidget(
-                        todoContent: data,
+                        todoEntity: data,
                         focusCallback: _focusCallback,
                         removeCallback: (item) {
                           _todoItemWidgets.remove(item);
@@ -66,10 +67,8 @@ class EditTodoListRoute extends StatelessWidget {
           builder: (context, widgets) {
             /// 记录下来widgets以及对应的todo文本
             _todoItemWidgets = widgets.data;
-            _todoItemStrs = _todoItemWidgets
-                .map((widget) => widget.getTodoContent())
-                .toList();
-            print(getTodos());
+            _todoItemStrs =
+                _todoItemWidgets.map((widget) => widget.getTodoInfo()).toList();
             return ReorderableListView(
                 onReorder: (oldInex, newIndex) {
                   /// 改变被移动widget在list中的位置
@@ -90,10 +89,10 @@ class EditTodoListRoute extends StatelessWidget {
   }
 
   /// 根据文本构建widgets，然后通过stream发射出去更新ui
-  void buildListItem(List<String> datas) {
+  void buildListItem(List<TodoEntity> datas) {
     List<EditTodoListItemWidget> widgets = datas
         .map((data) => EditTodoListItemWidget(
-              todoContent: data,
+              todoEntity: data,
               focusCallback: _focusCallback,
               removeCallback: (item) {
                 _todoItemWidgets.remove(item);
@@ -144,6 +143,7 @@ class EditTodoListRoute extends StatelessWidget {
 
     /// 在list尾加入一个有焦点的空输入框
     notEmptyWidgets.add(EditTodoListItemWidget(
+        todoEntity: TodoEntity(),
         autoFocus: true,
         focusCallback: _focusCallback,
         removeCallback: (item) {
@@ -153,17 +153,16 @@ class EditTodoListRoute extends StatelessWidget {
   }
 
   /// 获取当前的todo列表数据
-  List<String> getTodos() {
-    List<String> todos = List();
+  List<TodoEntity> getTodos() {
+    List<TodoEntity> todos = List();
     _todoItemWidgets.forEach((item) {
-      if (item.getTodoContent().isNotEmpty) {
-        todos.add(item.getTodoContent());
+      if (item.getTodoInfo() != null) {
+        todos.add(item.getTodoInfo());
       }
     });
     return todos;
   }
 }
-
 
 /// todo的
 class EditTodoListItemWidget extends StatelessWidget {
@@ -174,15 +173,21 @@ class EditTodoListItemWidget extends StatelessWidget {
   FocusNode _node = FocusNode();
   double height = 0;
   bool autoFocus;
+  TodoEntity todoEntity;
 
   EditTodoListItemWidget(
-      {this.todoContent = "",
+      {this.todoEntity,
       this.focusCallback,
       this.removeCallback,
       this.autoFocus = false})
-      : super(key: UniqueKey());
+      : super(key: UniqueKey()) {
+    todoContent = todoEntity?.todo ?? '';
+  }
 
-  String getTodoContent() => todoContent;
+  TodoEntity getTodoInfo() {
+    todoEntity.todo = todoContent;
+    return todoEntity;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -201,7 +206,7 @@ class EditTodoListItemWidget extends StatelessWidget {
 
   Widget buildTodoItem(String value) {
     controller = TextEditingController.fromValue(
-        TextEditingValue(text: getTodoContent()));
+        TextEditingValue(text: getTodoInfo()?.todo ?? ""));
     return Dismissible(
       key: UniqueKey(),
       onDismissed: (_) {

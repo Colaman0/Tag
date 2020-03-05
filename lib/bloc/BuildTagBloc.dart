@@ -1,6 +1,7 @@
 import 'package:rxdart/rxdart.dart';
 import 'package:tag/base/bloc.dart';
 import 'package:tag/entity/BuildTagInfo.dart';
+import 'package:tag/entity/TodoEntity.dart';
 
 class BuildTagBloc extends BlocBase {
   PublishSubject<String> _currentFuntion = PublishSubject();
@@ -8,7 +9,7 @@ class BuildTagBloc extends BlocBase {
 
   /// 选中的日期
   PublishSubject<DateTime> _selectDateStream = PublishSubject();
-  PublishSubject<List<String>> _todoList = PublishSubject();
+  PublishSubject<List<TodoEntity>> _todoList = PublishSubject();
 
   static Set<String> _addCategoryTags = Set();
 
@@ -23,15 +24,15 @@ class BuildTagBloc extends BlocBase {
 
   PublishSubject<DateTime> getSelectDateStream() => _selectDateStream;
 
-  PublishSubject<List<String>> getTodoListStream() => _todoList;
+  PublishSubject<List<TodoEntity>> getTodoListStream() => _todoList;
 
-  List<String> getTodoList() => _todoLists;
+  List<TodoEntity> getTodoList() => _todoLists;
 
-  DateTime _selectDateTime;
+  DateTime _selectDateTime = DateTime.now();
 
-  String _tagName;
+  String _tagName = "";
 
-  List<String> _todoLists = List();
+  List<TodoEntity> _todoLists = List();
 
   bool isInit = false;
 
@@ -40,8 +41,8 @@ class BuildTagBloc extends BlocBase {
     if (isInit) {
       return;
     }
-    isInit = true;
     if (info != null) {
+      isInit = true;
       selectDate(info.date);
       setTodoList(info.todos);
       _tagName = info.tagName;
@@ -75,13 +76,17 @@ class BuildTagBloc extends BlocBase {
   }
 
   /// 设置todolist内容
-  void setTodoList(List<String> todoList) {
+  void setTodoList(List<TodoEntity> todoList) {
     if (todoList == null) {
       return;
     }
     _todoLists = todoList;
     _todoList.add(todoList);
   }
+
+  /// 获取Tag的具体内容
+  BuildTagInfo getTagInfo() =>
+      BuildTagInfo(tagName: _tagName, date: _selectDateTime, todos: _todoLists);
 
   @override
   void dispose() {

@@ -84,7 +84,7 @@ class View extends StatelessWidget {
         margin: _margin?.getParams() ?? _defalut,
         width: double.infinity,
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: <Widget>[initChild()],
         ),
       );
@@ -95,6 +95,7 @@ class View extends StatelessWidget {
         margin: _margin?.getParams() ?? _defalut,
         height: double.infinity,
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[initChild()],
         ),
@@ -253,10 +254,10 @@ class View extends StatelessWidget {
     }
     var bothRadius = DP.toDouble(_bothRadius);
     return BorderRadius.only(
-      topLeft:
-          Radius.circular(_leftTop == null ? bothRadius : DP.toDouble(_leftTop)),
-      topRight:
-          Radius.circular(_rightTop == null ? bothRadius : DP.toDouble(_rightTop)),
+      topLeft: Radius.circular(
+          _leftTop == null ? bothRadius : DP.toDouble(_leftTop)),
+      topRight: Radius.circular(
+          _rightTop == null ? bothRadius : DP.toDouble(_rightTop)),
       bottomLeft: Radius.circular(
           _leftBottom == null ? bothRadius : DP.toDouble(_leftBottom)),
       bottomRight: Radius.circular(

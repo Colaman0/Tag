@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 import 'package:tag/entity/BuildTagInfo.dart';
 import 'package:tag/entity/Constants.dart';
+import 'package:tag/entity/TodoEntity.dart';
 import 'package:tag/route/BuildFlagRoute.dart';
 import 'package:tag/route/BuildTagRoute.dart';
 import 'package:tag/route/EditTodoListRoute.dart';
@@ -13,6 +14,7 @@ import 'package:tag/route/FlagBackgroundRoute.dart';
 import 'package:tag/route/LoginRoute.dart';
 import 'package:tag/route/SelectDateRoute.dart';
 import 'package:tag/route/SplashRoute.dart';
+import 'package:tag/route/TagDetailRoute.dart';
 import 'package:tag/route/main/MainPage.dart';
 
 ///
@@ -33,6 +35,7 @@ class NavigatorUtils {
     "/selectDate": (BuildContext context) => SelectDateRoute(),
     "/flagBg": (BuildContext context) => FlagBackgroundRoute(),
     "/editTodo": (BuildContext context) => EditTodoListRoute(),
+    "/tag": (BuildContext context) => TagDetailRoute(),
   };
 
   NavigatorUtils._();
@@ -64,22 +67,20 @@ class NavigatorUtils {
     Navigator.of(context).pushNamed("/buildFlag");
   }
 
-  void toBuildTag(BuildContext context, {BuildTagInfo buildTagInfo}) {
-    buildTagInfo = BuildTagInfo(
-        tagName: "去超市",
-        date: DateTime.now(),
-        todos: ["买可乐", "买猪肉和牛肉", "买几盒蛋糕和草莓，蛋糕要巧克力的，草莓要奶油的🍓"]);
+  Future<Object> toBuildTag(BuildContext context, {BuildTagInfo buildTagInfo}) {
     if (buildTagInfo != null) {
       HashMap<String, dynamic> hashMap = HashMap();
       hashMap.putIfAbsent(Constants.DATA, () {
         return buildTagInfo;
       });
       FlutterStatusbarcolor.setStatusBarWhiteForeground(true);
-      Navigator.of(context)
+      return Navigator.of(context)
           .pushNamed("/buildTag", arguments: hashMap)
           .whenComplete(() {
         FlutterStatusbarcolor.setStatusBarWhiteForeground(false);
       });
+    } else {
+      Navigator.of(context).pushNamed("/buildTag");
     }
   }
 
@@ -95,12 +96,20 @@ class NavigatorUtils {
   }
 
   Future<Object> toEditTodoList(BuildContext context,
-      {List<String> todos}) {
+      {List<TodoEntity> todos}) {
     HashMap<String, dynamic> hashMap = HashMap();
     hashMap.putIfAbsent(Constants.DATA, () {
       return todos;
     });
-    return Navigator.of(context)
-        .pushNamed("/editTodo", arguments: hashMap);
+    return Navigator.of(context).pushNamed("/editTodo", arguments: hashMap);
+  }
+
+  /// 跳转到Tag页面
+  Future<Object> toTagRoute(BuildContext context, BuildTagInfo info) {
+    HashMap<String, dynamic> hashMap = HashMap();
+    hashMap.putIfAbsent(Constants.DATA, () {
+      return info;
+    });
+    return Navigator.of(context).pushNamed("/tag", arguments: hashMap);
   }
 }
