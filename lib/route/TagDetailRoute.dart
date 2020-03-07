@@ -35,7 +35,7 @@ class _TagDetailRouteState extends State<TagDetailRoute> {
       appBar: AppBar(
         elevation: 0.0,
         title: TextView(
-          "Tag",
+          "详情",
           textSize: 28,
           textColor: Colors.white,
         ),
