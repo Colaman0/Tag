@@ -4,6 +4,8 @@ import 'dart:collection';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
+import 'package:tag/base/bloc.dart';
+import 'package:tag/bloc/BuildFlagBloc.dart';
 import 'package:tag/entity/BuildTagInfo.dart';
 import 'package:tag/entity/Constants.dart';
 import 'package:tag/entity/TodoEntity.dart';
@@ -84,13 +86,12 @@ class NavigatorUtils {
     }
   }
 
-  void toFlagBg(BuildContext context, String name, DateTime time) {
+  /// 跳转到选择Flag的背景页面
+  void toFlagBg(BuildContext context) {
+    BuildFlagBloc bloc = BlocProvider.of(context);
     HashMap<String, dynamic> hashMap = HashMap();
-    hashMap.putIfAbsent(FlagBackgroundRoute.FLAG_NAME, () {
-      return name;
-    });
-    hashMap.putIfAbsent(FlagBackgroundRoute.FLAG_DATE, () {
-      return time;
+    hashMap.putIfAbsent(Constants.DATA, () {
+      return bloc.buildFlagInfo();
     });
     Navigator.of(context).pushNamed("/flagBg", arguments: hashMap);
   }

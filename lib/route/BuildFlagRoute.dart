@@ -15,28 +15,18 @@ import 'package:tag/view/widget/view/TextView.dart';
 import 'package:tag/view/widget/view/View.dart';
 
 class BuildFlagRoute extends StatelessWidget {
-  // build类型
-  final buildType;
-
   BuildFlagBloc _flagBloc = BuildFlagBloc();
+
   BuildContext _context;
-
-  BuildFlagRoute({this.buildType});
-
-  DateTime _createTime;
-
-  String _flagTitle;
 
   @override
   Widget build(BuildContext context) {
-    _createTime = DateTime.now();
-    _flagBloc.selectDate(_createTime);
+    init(context);
     return BlocProvider(
         bloc: _flagBloc,
         child: Scaffold(body: Builder(
           builder: (BuildContext context) {
             _context = context;
-
             return Container(
               padding: EdgeInsets.only(top: ScreenUtil.statusBarHeight),
               decoration: BoxDecoration(
@@ -52,27 +42,28 @@ class BuildFlagRoute extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  View(
-                    child: Icon(Icons.arrow_back,
-                        size: DP.toDouble(48), color: Colors.white),
-                  ).size(width: 64, height: 64).click(() {
-                    Navigator.of(context).pop();
-                  }),
-                  TextView(
-                    "Create",
-                    textSize: 40,
-                    textColor: Colors.white,
-                  ).aligment(Alignment.centerLeft).margin(left: 16, top: 12),
-                  TextView(
-                    "New Flag",
-                    textSize: 40,
-                    textColor: Colors.white,
-                  ).aligment(Alignment.centerLeft).margin(left: 16, top: 4),
+                  Row(
+                    children: <Widget>[
+                      View(
+                        child: Icon(Icons.arrow_back,
+                            size: DP.toDouble(48), color: Colors.white),
+                      ).size(width: 64, height: 64).click(() {
+                        Navigator.of(context).pop();
+                      }),
+                      TextView(
+                        "创建Flag",
+                        textSize: 30,
+                        textColor: Colors.white,
+                      ).aligment(Alignment.centerLeft).margin(left: 16)
+                    ],
+                  ),
                   View(
                       child: Material(
                     color: Colors.transparent,
                     child: TextField(
-                      onChanged: (name) => _flagTitle = name,
+                      onChanged: (name) => _flagBloc.setFlagName(name),
+                      controller: TextEditingController.fromValue(
+                          TextEditingValue(text: _flagBloc.getTitle())),
                       style:
                           TextStyle(color: Colors.white, fontSize: SP.get(28)),
                       cursorColor: Colors.white70,
@@ -127,6 +118,12 @@ class BuildFlagRoute extends StatelessWidget {
         )));
   }
 
+  void init(BuildContext context) {
+    if (NavigatorUtils.getPreArguments(context) != null) {
+      _flagBloc.init(NavigatorUtils.getPreArguments(context)[Constants.DATA]);
+    }
+  }
+
   Widget getDateItem() {
     DateTime time;
     return View(
@@ -138,7 +135,7 @@ class BuildFlagRoute extends StatelessWidget {
             textColor: Colors.grey,
           ).aligment(Alignment.centerLeft),
           StreamBuilder<DateTime>(
-              initialData: _createTime,
+              initialData: _flagBloc.getSelectDate(),
               stream: _flagBloc.getSelectDateStream(),
               builder: (context, data) {
                 time = data.data;
@@ -171,7 +168,6 @@ class BuildFlagRoute extends StatelessWidget {
           backgroundColor: Colors.black38,
           builder: (context) {
             DateTime time = _flagBloc.getSelectDate();
-
             return Container(
                 width: double.infinity,
                 height: double.infinity,
@@ -181,7 +177,7 @@ class BuildFlagRoute extends StatelessWidget {
                   children: <Widget>[
                     View(
                       child: CalendarWidget(
-                          time: time ?? _createTime,
+                          time: time ?? _flagBloc.getSelectDate(),
                           selectCallback: (date) {
                             time = date;
                           }),
@@ -211,7 +207,7 @@ class BuildFlagRoute extends StatelessWidget {
   }
 
   Widget getTimeItem() {
-    DateTime time;
+    DateTime time = _flagBloc.getSelectDate();
     return View(
       child: Column(
         children: <Widget>[
@@ -221,7 +217,7 @@ class BuildFlagRoute extends StatelessWidget {
             textColor: Colors.grey,
           ).aligment(Alignment.centerLeft),
           StreamBuilder<DateTime>(
-              initialData: _createTime,
+              initialData: _flagBloc.getSelectDate(),
               stream: _flagBloc.getSelectDateStream(),
               builder: (context, data) {
                 time = data.data;
@@ -259,7 +255,7 @@ class BuildFlagRoute extends StatelessWidget {
                 alignment: Alignment.bottomCenter,
                 child: TimeSelectView(
                     dateTime: time,
-                    selectTimeFun: (time) => _flagBloc.selectDate(time())));
+                    selectTimeFun: (time) => _flagBloc.selectDate(time)));
           });
     });
   }
@@ -297,11 +293,10 @@ class BuildFlagRoute extends StatelessWidget {
           textSize: 24,
         ),
         onPressed: () {
-          if (_flagTitle == null || _flagTitle.isEmpty) {
+          if (_flagBloc.getTitle() == null || _flagBloc.getTitle().isEmpty) {
             Fluttertoast.showToast(msg: "标题不能为空");
           } else {
-            NavigatorUtils.getInstance()
-                .toFlagBg(context, _flagTitle, _flagBloc.getSelectDate());
+            NavigatorUtils.getInstance().toFlagBg(context);
           }
         },
       ),

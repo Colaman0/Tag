@@ -8,15 +8,13 @@ import 'package:image_picker/image_picker.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:tag/entity/BuildFlagInfo.dart';
 import 'package:tag/entity/BuildFlagInfo.dart';
+import 'package:tag/entity/Constants.dart';
 import 'package:tag/util/NaigatorUtils.dart';
 import 'package:tag/util/util.dart';
 import 'package:tag/view/widget/view/TextView.dart';
 import 'package:tag/view/widget/view/View.dart';
 
 class FlagBackgroundRoute extends StatelessWidget {
-  static final String FLAG_NAME = "flag_name";
-  static final String FLAG_DATE = "flag_date";
-
   /// 背景图片文件流
   PublishSubject<BuildFlagInfo> backgroundStream;
 
@@ -26,11 +24,7 @@ class FlagBackgroundRoute extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    /// 拿到上一页传过来的flag名字和日期，生成一个info
-    info = BuildFlagInfo(
-        flagName: NavigatorUtils.getPreArguments(context)[FLAG_NAME],
-        date: NavigatorUtils.getPreArguments(context)[FLAG_DATE]);
-
+    init(context);
     backgroundStream = PublishSubject();
 
     /// 把页面UI完善一下，生成一个widget list
@@ -39,13 +33,6 @@ class FlagBackgroundRoute extends StatelessWidget {
     positions.add(getTouchTips(context));
     positions.add(getAppbar());
 
-    /// 监听每次改变背景颜色/图片的操作，并且修改info的数据
-    backgroundStream.listen((entity) {
-      info.setImage(entity.backgroundImage);
-      info.setColor(entity.colorStr);
-      info.setBackgroundType(entity.backgroundType);
-      print(info);
-    });
     return Scaffold(
       body: Builder(
         builder: (context) {
@@ -58,6 +45,13 @@ class FlagBackgroundRoute extends StatelessWidget {
         },
       ),
     );
+  }
+
+  void init(BuildContext context) {
+    if (info == null) {
+      /// 拿到上一页传过来info
+      info = NavigatorUtils.getPreArguments(context)[Constants.DATA];
+    }
   }
 
   /// 顶部标题栏
@@ -184,9 +178,9 @@ class FlagBackgroundRoute extends StatelessWidget {
           onTap: () {
             ImagePicker.pickImage(source: ImageSource.gallery).then((image) {
               if (image != null) {
-                backgroundStream.add(BuildFlagInfo(
-                    backgroundType: BackgroundType.IMAGE,
-                    backgroundImage: image));
+                info.backgroundType = BackgroundType.IMAGE;
+                info.backgroundImage = image;
+                backgroundStream.add(info);
               }
             });
           },
@@ -233,9 +227,9 @@ class FlagBackgroundRoute extends StatelessWidget {
                               ImagePicker.pickImage(source: ImageSource.camera)
                                   .then((file) {
                                 if (file != null) {
-                                  backgroundStream.add(BuildFlagInfo(
-                                      backgroundType: BackgroundType.IMAGE,
-                                      backgroundImage: file));
+                                  info.backgroundType = BackgroundType.IMAGE;
+                                  info.backgroundImage = file;
+                                  backgroundStream.add(info);
                                 }
                               });
                             }),
@@ -248,9 +242,9 @@ class FlagBackgroundRoute extends StatelessWidget {
                               ImagePicker.pickImage(source: ImageSource.gallery)
                                   .then((file) {
                                 if (file != null) {
-                                  backgroundStream.add(BuildFlagInfo(
-                                      backgroundType: BackgroundType.IMAGE,
-                                      backgroundImage: file));
+                                  info.backgroundType = BackgroundType.IMAGE;
+                                  info.backgroundImage = file;
+                                  backgroundStream.add(info);
                                 }
                               });
                             }),
@@ -289,8 +283,9 @@ class FlagBackgroundRoute extends StatelessWidget {
         height: DP.toDouble(58),
       ),
       onTap: () {
-        backgroundStream.add(BuildFlagInfo(
-            backgroundType: BackgroundType.COLOR, colorStr: color));
+        info.backgroundType = BackgroundType.COLOR;
+        info.colorStr = color;
+        backgroundStream.add(info);
       },
     );
   }
@@ -305,6 +300,7 @@ List<Widget> getFlagContentWidgets(BuildFlagInfo info,
   if (backgroundStream != null) {
     background = Positioned(
       child: StreamBuilder<BuildFlagInfo>(
+        initialData: info,
         stream: backgroundStream,
         builder: (context, data) {
           if (data.data == null) {

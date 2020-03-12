@@ -5,13 +5,14 @@ enum BackgroundType { IMAGE, COLOR }
 class BuildFlagInfo {
   BackgroundType backgroundType;
   final String flagName;
+
   final DateTime date;
   File backgroundImage;
   String colorStr = "#80000000";
   List<String> categories;
 
   BuildFlagInfo(
-      {this.flagName,
+      {this.flagName = "",
       this.date,
       this.backgroundType,
       this.backgroundImage,

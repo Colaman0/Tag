@@ -1,6 +1,7 @@
 import 'package:rxdart/rxdart.dart';
 import 'package:tag/base/bloc.dart';
 import 'package:tag/entity/BuildFlagInfo.dart';
+import 'package:tag/entity/Constants.dart';
 
 class BuildFlagBloc extends BlocBase {
   PublishSubject<String> _currentFunction = PublishSubject();
@@ -22,13 +23,30 @@ class BuildFlagBloc extends BlocBase {
 
   PublishSubject<DateTime> getSelectDateStream() => _selectDateStream;
 
+  DateTime _selectDateTime = DateTime.now();
 
-  DateTime _selectDateTime;
+  BuildFlagInfo _initInfo;
+
+  String _flagTitle = "";
+
+  /// 初始化信息
+  void init(BuildFlagInfo info) {
+    if (_initInfo == null && info != null) {
+      _initInfo = info;
+      _flagTitle = info.flagName;
+      selectDate(info.date);
+      addCategoryItem(info.categories);
+    }
+  }
+
+  BuildFlagInfo getInitInfo() => _initInfo;
 
   void selectDate(DateTime dateTime) {
     _selectDateTime = dateTime;
     getSelectDateStream().add(dateTime);
   }
+
+  void setFlagName(String name) => _flagTitle = name;
 
   DateTime getSelectDate() => _selectDateTime;
 
@@ -40,18 +58,22 @@ class BuildFlagBloc extends BlocBase {
     }
   }
 
-
   void removeCategoryItem(String name) {
     _addCategoryTags.remove(name);
     getTagsStream().add(_addCategoryTags.toList());
   }
 
-  BuildFlagInfo buildFlagInfo(String name) {
+  BuildFlagInfo buildFlagInfo() {
     return BuildFlagInfo(
-        date: _selectDateTime,
-        flagName: name,
-        categories: _addCategoryTags.toList());
+        date: getSelectDate(),
+        flagName: getTitle(),
+        categories: _addCategoryTags.toList(),
+        backgroundType: _initInfo?.backgroundType ?? BackgroundType.COLOR,
+        backgroundImage: _initInfo?.backgroundImage,
+        colorStr: _initInfo?.colorStr ?? Constants.MAIN_COLOR);
   }
+
+  String getTitle() => _flagTitle;
 
   @override
   void dispose() {
