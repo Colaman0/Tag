@@ -31,7 +31,7 @@ class FlagBackgroundRoute extends StatelessWidget {
     List<Widget> positions =
         getFlagContentWidgets(info, backgroundStream: backgroundStream);
     positions.add(getTouchTips(context));
-    positions.add(getAppbar());
+    positions.add(getAppbar(context));
 
     return Scaffold(
       body: Builder(
@@ -55,7 +55,7 @@ class FlagBackgroundRoute extends StatelessWidget {
   }
 
   /// 顶部标题栏
-  Widget getAppbar() {
+  Widget getAppbar(BuildContext context) {
     return Positioned(
       top: ScreenUtil.statusBarHeight,
       left: 0,
@@ -70,15 +70,15 @@ class FlagBackgroundRoute extends StatelessWidget {
               size: DP.toDouble(36),
             ),
             onPressed: () {
-              Navigator.of(_context).pop();
+              Navigator.of(context).pop();
             },
           ),
           Spacer(),
           TextView("确定", textSize: 24, textColor: Colors.white)
               .padding(both: 16)
               .click(() {
-            //todo 用[info]生成一个正式的FLAG
-            NavigatorUtils.getInstance().toMain(_context);
+            /// 跳转到Flag页面
+            NavigatorUtils.getInstance().toFlagRoute(context, info);
           })
         ],
       ),

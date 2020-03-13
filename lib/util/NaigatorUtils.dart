@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 import 'package:tag/base/bloc.dart';
 import 'package:tag/bloc/BuildFlagBloc.dart';
+import 'package:tag/entity/BuildFlagInfo.dart';
 import 'package:tag/entity/BuildTagInfo.dart';
 import 'package:tag/entity/Constants.dart';
 import 'package:tag/entity/TodoEntity.dart';
@@ -18,6 +19,9 @@ import 'package:tag/route/SelectDateRoute.dart';
 import 'package:tag/route/SplashRoute.dart';
 import 'package:tag/route/TagDetailRoute.dart';
 import 'package:tag/route/main/MainPage.dart';
+import 'package:tag/view/flag/FlagDetailRoute.dart';
+
+import 'UserNavigatorObserver.dart';
 
 ///
 /// * author : kyle
@@ -38,6 +42,7 @@ class NavigatorUtils {
     "/flagBg": (BuildContext context) => FlagBackgroundRoute(),
     "/editTodo": (BuildContext context) => EditTodoListRoute(),
     "/tag": (BuildContext context) => TagDetailRoute(),
+    "/flag": (BuildContext context) => FlagDetailRoute(),
   };
 
   NavigatorUtils._();
@@ -65,8 +70,21 @@ class NavigatorUtils {
         .pushNamedAndRemoveUntil('/main', (Route<dynamic> route) => false);
   }
 
-  void toBuildFlag(BuildContext context) {
-    Navigator.of(context).pushNamed("/buildFlag");
+  Future<Object> toBuildFlag(BuildContext context, {BuildFlagInfo info}) {
+    if (info != null) {
+      HashMap<String, dynamic> hashMap = HashMap();
+      hashMap.putIfAbsent(Constants.DATA, () {
+        return info;
+      });
+      FlutterStatusbarcolor.setStatusBarWhiteForeground(true);
+      return Navigator.of(context)
+          .pushNamed("/buildFlag", arguments: hashMap)
+          .whenComplete(() {
+        FlutterStatusbarcolor.setStatusBarWhiteForeground(false);
+      });
+    } else {
+      return Navigator.of(context).pushNamed("/buildFlag");
+    }
   }
 
   Future<Object> toBuildTag(BuildContext context, {BuildTagInfo buildTagInfo}) {
@@ -87,13 +105,13 @@ class NavigatorUtils {
   }
 
   /// 跳转到选择Flag的背景页面
-  void toFlagBg(BuildContext context) {
+  Future<Object> toFlagBg(BuildContext context) {
     BuildFlagBloc bloc = BlocProvider.of(context);
     HashMap<String, dynamic> hashMap = HashMap();
     hashMap.putIfAbsent(Constants.DATA, () {
       return bloc.buildFlagInfo();
     });
-    Navigator.of(context).pushNamed("/flagBg", arguments: hashMap);
+    return Navigator.of(context).pushNamed("/flagBg", arguments: hashMap);
   }
 
   Future<Object> toEditTodoList(BuildContext context,
@@ -112,5 +130,25 @@ class NavigatorUtils {
       return info;
     });
     return Navigator.of(context).pushNamed("/tag", arguments: hashMap);
+  }
+
+  /// 跳转到Flag页面
+  Future<Object> toFlagRoute(BuildContext context, BuildFlagInfo info) {
+    HashMap<String, dynamic> hashMap = HashMap();
+    hashMap.putIfAbsent(Constants.DATA, () {
+      return info;
+    });
+
+    /// 移出掉中间的所有route
+    bool remove = true;
+    while (remove) {
+      if (UserNavigatorObserver.history.length > 2) {
+        Navigator.of(context).removeRoute(UserNavigatorObserver.history[1]);
+      } else {
+        remove = false;
+      }
+    }
+    return Navigator.of(context)
+        .pushReplacementNamed("/flag", arguments: hashMap);
   }
 }

@@ -51,7 +51,7 @@ class BuildFlagRoute extends StatelessWidget {
                         Navigator.of(context).pop();
                       }),
                       TextView(
-                        "创建Flag",
+                        _flagBloc.isInit() ? '编辑Flag' : '创建Flag',
                         textSize: 30,
                         textColor: Colors.white,
                       ).aligment(Alignment.centerLeft).margin(left: 16)
@@ -288,7 +288,7 @@ class BuildFlagRoute extends StatelessWidget {
         icon: Icon(Icons.add_circle, color: Colors.white30),
         color: HexColor("#13547a"),
         label: TextView(
-          "创建",
+          _flagBloc.isInit() ? '保存' : '创建',
           textColor: Colors.white,
           textSize: 24,
         ),
@@ -296,7 +296,7 @@ class BuildFlagRoute extends StatelessWidget {
           if (_flagBloc.getTitle() == null || _flagBloc.getTitle().isEmpty) {
             Fluttertoast.showToast(msg: "标题不能为空");
           } else {
-            NavigatorUtils.getInstance().toFlagBg(context);
+            NavigatorUtils.getInstance().toFlagBg(context).then((data) {});
           }
         },
       ),
@@ -305,6 +305,7 @@ class BuildFlagRoute extends StatelessWidget {
 
   Widget getCategoryItem() {
     return StreamBuilder<List<String>>(
+        initialData: _flagBloc.getInitInfo()?.categories ?? [],
         stream: _flagBloc.getTagsStream(),
         builder: (context, data) {
           ///  把标签list转换成对应的chip控件显示

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:tag/util/NaigatorUtils.dart';
+import 'package:tag/util/UserNavigatorObserver.dart';
 
 void main() {
   debugPaintSizeEnabled = !true;
@@ -16,15 +17,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        pageTransitionsTheme: PageTransitionsTheme(
-          builders: <TargetPlatform, PageTransitionsBuilder>{
-            TargetPlatform.iOS: createTransition(),
-            TargetPlatform.android: createTransition(),
-          },
-        ),
-      ),
+      navigatorObservers:[UserNavigatorObserver()] ,
       initialRoute: '/',
       routes: NavigatorUtils.routeMap,
     );

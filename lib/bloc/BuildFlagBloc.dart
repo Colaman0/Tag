@@ -41,6 +41,8 @@ class BuildFlagBloc extends BlocBase {
 
   BuildFlagInfo getInitInfo() => _initInfo;
 
+  bool isInit() => _initInfo != null;
+
   void selectDate(DateTime dateTime) {
     _selectDateTime = dateTime;
     getSelectDateStream().add(dateTime);
