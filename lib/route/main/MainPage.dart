@@ -8,7 +8,9 @@ import 'package:tag/util/NaigatorUtils.dart';
 import 'package:tag/util/util.dart';
 import 'package:tag/view/bind/BindViewPager.dart';
 import 'package:tag/view/main/MainContentsWidget.dart';
+import 'package:tag/view/tag/HomeTagContentWidget.dart';
 import 'package:tag/view/widget/CustomDialog.dart';
+import 'package:tag/view/widget/view/HomeCalendarWidget.dart';
 import 'package:tag/view/widget/view/TextView.dart';
 import 'package:tag/view/widget/view/View.dart';
 
@@ -51,8 +53,8 @@ class _MainPageState extends State<MainPage> {
           scrollDirection: Axis.horizontal,
           onPageChanged: (page) => _pageStream.add(page),
           children: <Widget>[
+            HomeTagContentWidget(),
             TimeTagRoute(),
-            View().size(width: 200, height: 200).backgroundColor(Colors.cyan),
           ],
         ),
         stream: _pageStream,
