@@ -4,8 +4,6 @@ import 'package:tag/entity/Constants.dart';
 import 'package:tag/util/util.dart';
 import 'package:tag/view/tag/HomeTagListWidget.dart';
 import 'package:tag/view/widget/view/HomeCalendarWidget.dart';
-import 'package:tag/view/widget/view/TextView.dart';
-import 'package:tag/view/widget/view/View.dart';
 
 class HomeTagContentWidget extends StatefulWidget {
   @override

@@ -42,6 +42,11 @@ class _MainPageState extends State<MainPage> {
             textSize: 30,
           ).aligment(Alignment.centerLeft),
         ),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.search),
+          )
+        ],
       ),
       drawer: getDrawer(),
       backgroundColor: Colors.white,
