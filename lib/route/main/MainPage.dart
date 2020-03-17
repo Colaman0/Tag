@@ -7,8 +7,10 @@ import 'package:tag/route/BuildTagRoute.dart';
 import 'package:tag/util/NaigatorUtils.dart';
 import 'package:tag/util/util.dart';
 import 'package:tag/view/bind/BindViewPager.dart';
+import 'package:tag/view/flag/SearchFlagRoute.dart';
 import 'package:tag/view/main/MainContentsWidget.dart';
 import 'package:tag/view/tag/HomeTagContentWidget.dart';
+import 'package:tag/view/tag/SearchTagRoute.dart';
 import 'package:tag/view/widget/CustomDialog.dart';
 import 'package:tag/view/widget/view/HomeCalendarWidget.dart';
 import 'package:tag/view/widget/view/TextView.dart';
@@ -26,6 +28,7 @@ class _MainPageState extends State<MainPage> {
   final PageController _controller = new PageController();
   final PublishSubject<int> _pageStream = new PublishSubject();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
+  bool isTagMode = true;
 
   @override
   Widget build(BuildContext context) {
@@ -45,6 +48,11 @@ class _MainPageState extends State<MainPage> {
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.search),
+            onPressed: () {
+              showSearch(
+                  context: context,
+                  delegate: isTagMode ? SearchTagRoute() : SearchFlagRoute());
+            },
           )
         ],
       ),
@@ -68,6 +76,7 @@ class _MainPageState extends State<MainPage> {
         stream: _pageStream,
         initialData: 0,
         builder: (context, snap) {
+          isTagMode = snap.data == 0;
           return BottomAppBar(
             color: Colors.white,
             child: Row(

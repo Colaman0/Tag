@@ -83,10 +83,7 @@ class View extends StatelessWidget {
         padding: _padding?.getParams() ?? _defalut,
         margin: _margin?.getParams() ?? _defalut,
         width: double.infinity,
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[initChild()],
-        ),
+        child: initChild(),
       );
     } else if (_width == View.WRAP && _height == View.MATCH) {
       body = Container(

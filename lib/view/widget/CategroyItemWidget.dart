@@ -11,6 +11,7 @@ class CategoryItemWidget extends StatelessWidget with SelectItem {
   final bool clickAble;
   final bool removeAble;
   final Function removeCallback;
+  final int textSize;
   final PublishSubject<bool> selectStream = PublishSubject();
 
   CategoryItemWidget(
@@ -18,7 +19,8 @@ class CategoryItemWidget extends StatelessWidget with SelectItem {
       this.name,
       this.clickAble = true,
       this.removeCallback,
-      this.removeAble = false})
+      this.removeAble = false,
+      this.textSize = 26})
       : super(key: key);
 
   @override
@@ -51,7 +53,7 @@ class CategoryItemWidget extends StatelessWidget with SelectItem {
                   : null,
               label: Text(name,
                   style: TextView.getDefaultStyle(
-                      fontSize: SP.get(26),
+                      fontSize: SP.get(textSize),
                       textColor: data.data ? Colors.white : Colors.white))),
           onTap: () {
             if (clickAble) {

@@ -46,12 +46,14 @@ class _TodoItemWidgetState extends State<TodoItemWidget> {
           value: widget?.todoEntity?.isFinish ?? false,
           activeColor: HexColor(Constants.COLOR_3),
           checkColor: Colors.white,
-          onChanged: (select) {
-            setState(() {
-              widget?.todoEntity?.isFinish = select;
-              widget?.voidCallback();
-            });
-          },
+          onChanged: widget?.voidCallback == null
+              ? null
+              : (select) {
+                  setState(() {
+                    widget?.todoEntity?.isFinish = select;
+                    widget?.voidCallback();
+                  });
+                },
         ),
         Expanded(
           child: Text(
@@ -73,7 +75,7 @@ class _TodoItemWidgetState extends State<TodoItemWidget> {
     )).padding(both: 12).click(() {
       setState(() {
         widget?.todoEntity?.isFinish = !(widget?.todoEntity?.isFinish ?? false);
-        widget.voidCallback();
+        widget?.voidCallback();
       });
     });
   }
