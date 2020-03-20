@@ -85,3 +85,4 @@ bool IsExpansion(
     ..layout(maxWidth: constraints.maxWidth, minWidth: constraints.minWidth);
   return _textPainter.didExceedMaxLines;
 }
+

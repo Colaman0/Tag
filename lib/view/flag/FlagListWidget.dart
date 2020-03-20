@@ -41,18 +41,18 @@ class _FlagListWidgetState extends State<FlagListWidget> {
                     runAlignment: WrapAlignment.start,
                     children: info.categories
                         .map((tagName) => Card(
-                      child: TextView(
-                        tagName,
-                        textColor: Colors.white,
-                      )
-                          .aligment(null)
-                          .backgroundColorStr(tagColor)
-                          .corner(leftBottom: 5, rightBottom: 5)
-                          .padding(
-                          left: 12, right: 12, top: 8, bottom: 8)
-                          .size(width: View.WRAP, height: View.WRAP),
-                      elevation: 3,
-                    ))
+                              child: TextView(
+                                tagName,
+                                textColor: Colors.white,
+                              )
+                                  .aligment(null)
+                                  .backgroundColorStr(tagColor)
+                                  .corner(leftBottom: 5, rightBottom: 5)
+                                  .padding(
+                                      left: 12, right: 12, top: 8, bottom: 8)
+                                  .size(width: View.WRAP, height: View.WRAP),
+                              elevation: 3,
+                            ))
                         .toList(),
                     spacing: DP.toDouble(8),
                   ),
@@ -101,7 +101,7 @@ class _FlagListWidgetState extends State<FlagListWidget> {
                                   ),
                                   Expanded(
                                       child: TextView(
-                                    info.flagName + "还有",
+                                    '${info.flagName}${info.date.difference(DateTime.now()).inDays >= 0 ? "已经" : "还有"}',
                                     textSize: 30,
                                     textColor: Colors.black,
                                   )
@@ -112,7 +112,11 @@ class _FlagListWidgetState extends State<FlagListWidget> {
                               ),
                             ),
                             View(
-                              child: buildDayText("123"),
+                              child: buildDayText(info.date
+                                  .difference(DateTime.now())
+                                  .inDays
+                                  .abs()
+                                  .toString()),
                             )
                                 .size(width: 120, height: View.MATCH)
                                 .backgroundColorStr(dayColor)
@@ -142,9 +146,13 @@ class _FlagListWidgetState extends State<FlagListWidget> {
               double fontSize = calculateAutoscaleFontSize(
                   text,
                   GoogleFonts.rubik(),
-                  SP.get(28),
+                  SP.get(48),
                   box.maxWidth - DP.toDouble(12));
+              if (fontSize > SP.get(48)) {
+                fontSize = SP.get(48);
+              }
               return Container(
+                alignment: Alignment.center,
                 child: Baseline(
                   child: Text(text,
                       softWrap: false,
@@ -153,7 +161,7 @@ class _FlagListWidgetState extends State<FlagListWidget> {
                             TextStyle(color: Colors.white, fontSize: fontSize),
                       )),
                   baselineType: TextBaseline.alphabetic,
-                  baseline: DP.toDouble(50),
+                  baseline: DP.toDouble(1),
                 ),
                 margin: EdgeInsets.only(
                     left: DP.toDouble(12), right: DP.toDouble(4)),

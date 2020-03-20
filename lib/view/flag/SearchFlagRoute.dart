@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tag/entity/BuildFlagInfo.dart';
+import 'package:tag/util/DataProvider.dart';
 import 'package:tag/view/flag/FlagListWidget.dart';
 
 class SearchFlagRoute extends SearchDelegate {
@@ -28,17 +29,9 @@ class SearchFlagRoute extends SearchDelegate {
   @override
   Widget buildSuggestions(BuildContext context) {
     return FutureBuilder<List<BuildFlagInfo>>(
-      initialData: [
-        BuildFlagInfo(
-            flagName: "距离林世杰生日",
-            date: DateTime.now(),
-            categories: ["生日", "自己"]),
-        BuildFlagInfo(
-            flagName: "距离林XX生日", date: DateTime.now(), categories: ["恩啊"])
-      ],
+      future: DataProvider.getInstance().searchFlag(query),
       builder: (context, data) {
-        List<BuildFlagInfo> infos = data.data;
-        return FlagListWidget(infos: infos);
+        return FlagListWidget(infos: data.data);
       },
     );
   }

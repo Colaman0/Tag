@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
-import 'package:tag/entity/BuildFlagInfo.dart';
+import 'package:tag/entity/BuildTagInfo.dart';
+import 'package:tag/entity/TodoEntity.dart';
 import 'package:tag/view/flag/FlagListWidget.dart';
+import 'package:tag/view/tag/TagListWidget.dart';
 
 /// 首页tag列表的widget
 class HomeTagListWidget extends StatefulWidget {
@@ -11,18 +13,23 @@ class HomeTagListWidget extends StatefulWidget {
 class _HomeTagListWidgetState extends State<HomeTagListWidget> {
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<List<BuildFlagInfo>>(
+    return StreamBuilder<List<BuildTagInfo>>(
       initialData: [
-        BuildFlagInfo(
-            flagName: "距离林世杰生日",
-            date: DateTime.now(),
-            categories: ["生日", "自己"]),
-        BuildFlagInfo(
-            flagName: "距离林XX生日", date: DateTime.now(), categories: ["恩啊"])
+        BuildTagInfo(tagName: "1234", date: DateTime.now(), todos: [
+          TodoEntity(todo: "第一条呢"),
+          TodoEntity(todo: "买可乐啊记得！", isFinish: true),
+          TodoEntity(todo: "下午打个球", isFinish: false),
+        ]),
+        BuildTagInfo(tagName: "1234", date: DateTime.now(), todos: [
+          TodoEntity(todo: "第一条呢"),
+          TodoEntity(todo: "买可乐啊记得！", isFinish: true),
+          TodoEntity(todo: "下午打个球", isFinish: false),
+          TodoEntity(todo: "123123123123", isFinish: false),
+        ])
       ],
       builder: (context, data) {
-        List<BuildFlagInfo> infos = data.data;
-        return FlagListWidget(infos: infos);
+        List<BuildTagInfo> infos = data.data;
+        return TagListWidget(infos: infos);
       },
     );
   }

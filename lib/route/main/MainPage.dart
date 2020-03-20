@@ -41,7 +41,7 @@ class _MainPageState extends State<MainPage> {
         title: StreamBuilder<int>(
           stream: _pageStream,
           builder: (context, page) => TextView(
-            page.data == 0 ? 'Tag' : '里程碑',
+            page.data == 0 ? '清单' : '里程碑',
             textSize: 30,
           ).aligment(Alignment.centerLeft),
         ),
