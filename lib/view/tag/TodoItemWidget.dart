@@ -1,8 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:tag/base/bloc.dart';
+import 'package:tag/bloc/BuildTagBloc.dart';
+import 'package:tag/entity/BuildTagInfo.dart';
 import 'package:tag/entity/Constants.dart';
-import 'package:tag/entity/TodoEntity.dart';
 import 'package:tag/util/util.dart';
 import 'package:tag/view/widget/view/View.dart';
 
@@ -14,18 +17,18 @@ class TodoItemWidget extends StatefulWidget {
   /// todo具体内容
   String todo = "";
 
-  final TodoEntity todoEntity;
+  final Todo todoEntity;
 
-  VoidCallback voidCallback;
+  Function voidCallback;
 
   TodoItemWidget({Key key, this.todoEntity, this.voidCallback})
       : super(key: key) {
     /// 初始化数据
-    isFinish = todoEntity?.isFinish ?? false;
-    todo = todoEntity?.todo ?? '';
+    isFinish = todoEntity?.isTodoFinish() ?? false;
+    todo = todoEntity?.name ?? '';
   }
 
-  TodoEntity getTodoEntity() {
+  Todo getTodoEntity() {
     return todoEntity;
   }
 
@@ -43,28 +46,37 @@ class _TodoItemWidgetState extends State<TodoItemWidget> {
       children: <Widget>[
         Checkbox(
           materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          value: widget?.todoEntity?.isFinish ?? false,
+          value: widget?.todoEntity?.isTodoFinish() ?? false,
           activeColor: HexColor(Constants.COLOR_3),
           checkColor: Colors.white,
           onChanged: widget?.voidCallback == null
               ? null
               : (select) {
-                  setState(() {
-                    widget?.todoEntity?.isFinish = select;
-                    widget?.voidCallback();
+                  BuildTagBloc bloc = BlocProvider.of(context);
+                  widget?.todoEntity?.setFinish(select);
+                  bloc.updateTag((result) {
+                    if (result) {
+                      setState(() {
+                        widget?.todoEntity?.setFinish(select);
+                        widget?.voidCallback();
+                      });
+                    } else {
+                      widget?.todoEntity?.setFinish(!select);
+                      Fluttertoast.showToast(msg: "网络错误");
+                    }
                   });
                 },
         ),
         Expanded(
           child: Text(
-            widget?.todoEntity?.todo ?? "",
+            widget?.todoEntity?.name ?? "",
             style: GoogleFonts.rubik(
                 textStyle: TextStyle(
-              color: widget?.todoEntity?.isFinish ?? false
+              color: widget?.todoEntity?.isTodoFinish() ?? false
                   ? HexColor(Constants.COLOR_3)
                   : Colors.black,
               fontSize: SP.get(28),
-              decoration: widget?.todoEntity?.isFinish ?? false
+              decoration: widget?.todoEntity?.isTodoFinish() ?? false
                   ? TextDecoration.lineThrough
                   : TextDecoration.none,
               decorationColor: Colors.grey,
@@ -74,7 +86,8 @@ class _TodoItemWidgetState extends State<TodoItemWidget> {
       ],
     )).padding(both: 12).click(() {
       setState(() {
-        widget?.todoEntity?.isFinish = !(widget?.todoEntity?.isFinish ?? false);
+        widget?.todoEntity
+            ?.setFinish(!(widget?.todoEntity?.isTodoFinish() ?? false));
         widget?.voidCallback();
       });
     });

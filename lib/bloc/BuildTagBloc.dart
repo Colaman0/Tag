@@ -2,6 +2,7 @@ import 'package:rxdart/rxdart.dart';
 import 'package:tag/base/bloc.dart';
 import 'package:tag/entity/BuildTagInfo.dart';
 import 'package:tag/entity/TodoEntity.dart';
+import 'package:tag/util/DataProvider.dart';
 
 class BuildTagBloc extends BlocBase {
   PublishSubject<String> _currentFuntion = PublishSubject();
@@ -9,7 +10,7 @@ class BuildTagBloc extends BlocBase {
 
   /// 选中的日期
   PublishSubject<DateTime> _selectDateStream = PublishSubject();
-  PublishSubject<List<TodoEntity>> _todoList = PublishSubject();
+  PublishSubject<List<Todo>> _todoList = PublishSubject();
 
   static Set<String> _addCategoryTags = Set();
 
@@ -24,17 +25,18 @@ class BuildTagBloc extends BlocBase {
 
   PublishSubject<DateTime> getSelectDateStream() => _selectDateStream;
 
-  PublishSubject<List<TodoEntity>> getTodoListStream() => _todoList;
+  PublishSubject<List<Todo>> getTodoListStream() => _todoList;
 
-  List<TodoEntity> getTodoList() => _todoLists;
+  List<Todo> getTodoList() => _todoLists;
 
   DateTime _selectDateTime = DateTime.now();
 
   String _tagName = "";
 
-  List<TodoEntity> _todoLists = List();
+  List<Todo> _todoLists = List();
 
   bool isInit = false;
+  BuildTagInfo _initInfo;
 
   /// 设置初始数据
   void initData(BuildTagInfo info) {
@@ -42,9 +44,10 @@ class BuildTagBloc extends BlocBase {
       return;
     }
     if (info != null) {
+      _initInfo = info;
       isInit = true;
-      selectDate(info.date);
-      setTodoList(info.todos);
+      selectDate(DateTime.fromMicrosecondsSinceEpoch(info.dateInt * 1000));
+      setTodoList(info.todo);
       _tagName = info.tagName;
     }
   }
@@ -76,7 +79,7 @@ class BuildTagBloc extends BlocBase {
   }
 
   /// 设置todolist内容
-  void setTodoList(List<TodoEntity> todoList) {
+  void setTodoList(List<Todo> todoList) {
     if (todoList == null) {
       return;
     }
@@ -85,8 +88,31 @@ class BuildTagBloc extends BlocBase {
   }
 
   /// 获取Tag的具体内容
-  BuildTagInfo getTagInfo() =>
-      BuildTagInfo(tagName: _tagName, date: _selectDateTime, todos: _todoLists);
+  BuildTagInfo getTagInfo() {
+    if (_initInfo != null) {
+      _initInfo.tagName = _tagName;
+      _initInfo.dateInt = _selectDateTime.millisecondsSinceEpoch;
+      _initInfo.todo = _todoLists;
+      return _initInfo;
+    } else {
+      return BuildTagInfo(
+          tagName: _tagName,
+          dateInt: _selectDateTime.millisecondsSinceEpoch,
+          todo: _todoLists);
+    }
+  }
+
+  void updateTag(Function callback) {
+    getTagInfo().update().then((value) {
+      callback(true);
+    }, onError: (error) => callback(false));
+  }
+
+  void addNewTag(Function callback) {
+    getTagInfo().save().then((value) {
+      callback(true, value.objectId);
+    }, onError: (error) => callback(false, null));
+  }
 
   @override
   void dispose() {

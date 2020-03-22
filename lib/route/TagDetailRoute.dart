@@ -1,9 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:tag/base/bloc.dart';
+import 'package:tag/bloc/BuildTagBloc.dart';
 import 'package:tag/entity/BuildTagInfo.dart';
 import 'package:tag/entity/Constants.dart';
-import 'package:tag/entity/TodoEntity.dart';
 import 'package:tag/util/NaigatorUtils.dart';
 import 'package:tag/util/util.dart';
 import 'package:tag/view/tag/TodoItemWidget.dart';
@@ -25,124 +26,128 @@ class _TagDetailRouteState extends State<TagDetailRoute> {
   VoidCallback _voidCallback;
 
   PublishSubject<String> progressStream = PublishSubject();
-  PublishSubject<List<TodoEntity>> todoStream = PublishSubject();
+  PublishSubject<List<Todo>> todoStream = PublishSubject();
+  BuildTagBloc _bloc = BuildTagBloc();
 
   @override
   Widget build(BuildContext context) {
     init(context);
-    return Scaffold(
-      backgroundColor: HexColor(Constants.MAIN_COLOR),
-      appBar: AppBar(
-        elevation: 0.0,
-        title: TextView(
-          "详情",
-          textSize: 28,
-          textColor: Colors.white,
-        ),
+    return BlocProvider(
+      bloc: _bloc,
+      child: Scaffold(
         backgroundColor: HexColor(Constants.MAIN_COLOR),
-        leading: IconButton(
-            icon: Icon(Icons.arrow_back),
-            onPressed: () {
-              Navigator.of(context).pop();
-            }),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.brightness_medium),
-            onPressed: () {
-              NavigatorUtils.getInstance()
-                  .toBuildTag(context, buildTagInfo: getTagInfo())
-                  .then((data) {
-                if (data != null && data is BuildTagInfo) {
-                  setState(() {
-                    _initInfo = data;
-                  });
-                }
-              });
-            },
-          )
-        ],
-      ),
-      body: Column(
-        mainAxisSize: MainAxisSize.max,
-        children: <Widget>[
-          View(
-                  child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Icon(
-                    Icons.bookmark,
-                    color: Colors.white,
-                  ),
-                  TextView(
-                    "${_initInfo.tagName}",
-                    textColor: Colors.white,
-                    textSize: 32,
-                  ).margin(left: 16)
-                ],
-              ),
-              SizedBox(
-                height: DP.toDouble(16),
-              ),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Icon(
-                    Icons.calendar_today,
-                    color: Colors.white,
-                  ),
-                  TextView(
-                    "${_initInfo.date.year}-${_initInfo.date.month}-${_initInfo.date.day.toString().padLeft(2, '0')}   ${_initInfo.date.hour.toString().padLeft(2, '0')}:${_initInfo.date.minute.toString().padLeft(2, '0')}",
-                    textColor: Colors.white,
-                    textSize: 28,
-                  ).margin(left: 16)
-                ],
-              ),
-              SizedBox(
-                height: DP.toDouble(16),
-              ),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Icon(
-                    Icons.assignment_turned_in,
-                    color: Colors.white,
-                  ),
-                  StreamBuilder(
-                    initialData: createProgressText(
-                        _initInfo.todos
-                            .where((item) => item.isFinish)
-                            .toList()
-                            .length,
-                        _initInfo.todos.length),
-                    stream: progressStream,
-                    builder: (context, data) {
-                      return TextView(
-                        data?.data ?? "",
-                        textColor: Colors.white,
-                        textSize: 28,
-                      ).margin(left: 16);
-                    },
-                  )
-                ],
-              )
-            ],
-          ))
-              .aligment(Alignment.topLeft)
-              .padding(left: 16, top: 16, right: 16, bottom: 48)
-              .size(width: View.MATCH)
-              .backgroundColorStr(Constants.MAIN_COLOR),
-          Expanded(
-            child: View(child: buildTodoWidget(context))
-                .size(width: View.MATCH, height: View.MATCH)
-                .padding(top: 16, bottom: 16)
-                .corner(leftTop: 30, rightTop: 30)
-                .backgroundColor(Colors.white),
-          )
-        ],
+        appBar: AppBar(
+          elevation: 0.0,
+          title: TextView(
+            "详情",
+            textSize: 28,
+            textColor: Colors.white,
+          ),
+          backgroundColor: HexColor(Constants.MAIN_COLOR),
+          leading: IconButton(
+              icon: Icon(Icons.arrow_back),
+              onPressed: () {
+                Navigator.of(context).pop();
+              }),
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(Icons.brightness_medium),
+              onPressed: () {
+                NavigatorUtils.getInstance()
+                    .toBuildTag(context, buildTagInfo: getTagInfo())
+                    .then((data) {
+                  if (data != null && data is BuildTagInfo) {
+                    setState(() {
+                      _initInfo = data;
+                    });
+                  }
+                });
+              },
+            )
+          ],
+        ),
+        body: Column(
+          mainAxisSize: MainAxisSize.max,
+          children: <Widget>[
+            View(
+                    child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Icon(
+                      Icons.bookmark,
+                      color: Colors.white,
+                    ),
+                    TextView(
+                      "${_initInfo.tagName}",
+                      textColor: Colors.white,
+                      textSize: 32,
+                    ).margin(left: 16)
+                  ],
+                ),
+                SizedBox(
+                  height: DP.toDouble(16),
+                ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Icon(
+                      Icons.calendar_today,
+                      color: Colors.white,
+                    ),
+                    TextView(
+                      "${_initInfo.getDate().year}-${_initInfo.getDate().month}-${_initInfo.getDate().day.toString().padLeft(2, '0')}   ${_initInfo.getDate().hour.toString().padLeft(2, '0')}:${_initInfo.getDate().minute.toString().padLeft(2, '0')}",
+                      textColor: Colors.white,
+                      textSize: 28,
+                    ).margin(left: 16)
+                  ],
+                ),
+                SizedBox(
+                  height: DP.toDouble(16),
+                ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Icon(
+                      Icons.assignment_turned_in,
+                      color: Colors.white,
+                    ),
+                    StreamBuilder(
+                      initialData: createProgressText(
+                          _initInfo.todo
+                              .where((item) => item.isTodoFinish())
+                              .toList()
+                              .length,
+                          _initInfo.todo.length),
+                      stream: progressStream,
+                      builder: (context, data) {
+                        return TextView(
+                          data?.data ?? "",
+                          textColor: Colors.white,
+                          textSize: 28,
+                        ).margin(left: 16);
+                      },
+                    )
+                  ],
+                )
+              ],
+            ))
+                .aligment(Alignment.topLeft)
+                .padding(left: 16, top: 16, right: 16, bottom: 48)
+                .size(width: View.MATCH)
+                .backgroundColorStr(Constants.MAIN_COLOR),
+            Expanded(
+              child: View(child: buildTodoWidget(context))
+                  .size(width: View.MATCH, height: View.MATCH)
+                  .padding(top: 16, bottom: 16)
+                  .corner(leftTop: 30, rightTop: 30)
+                  .backgroundColor(Colors.white),
+            )
+          ],
+        ),
       ),
     );
   }
@@ -151,11 +156,12 @@ class _TagDetailRouteState extends State<TagDetailRoute> {
   void init(BuildContext context) {
     if (_initInfo == null) {
       _initInfo = NavigatorUtils.getPreArguments(context)[Constants.DATA];
+      _bloc.initData(_initInfo);
       _voidCallback = () {
         /// 已完成的todo数量
         int finish = 0;
         _todoItems.forEach((item) {
-          if (item.getTodoEntity().isFinish) {
+          if (item.getTodoEntity().isTodoFinish()) {
             finish++;
           }
         });
@@ -167,7 +173,7 @@ class _TagDetailRouteState extends State<TagDetailRoute> {
   String createProgressText(int finish, int total) => "清单进度 : $finish / $total";
 
   Widget buildTodoWidget(BuildContext context) {
-    List<TodoEntity> datas = _initInfo.todos;
+    List<Todo> datas = _initInfo.todo;
     _todoItems.clear();
     return ListView.separated(
         separatorBuilder: (BuildContext context, int index) => Divider(
@@ -188,7 +194,7 @@ class _TagDetailRouteState extends State<TagDetailRoute> {
   }
 
   BuildTagInfo getTagInfo() {
-    _initInfo.todos = _todoItems.map((item) => item.getTodoEntity()).toList();
+    _initInfo.todo = _todoItems.map((item) => item.getTodoEntity()).toList();
     return _initInfo;
   }
 }

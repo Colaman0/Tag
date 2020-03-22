@@ -1,29 +1,30 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:tag/entity/BuildTagInfo.dart';
 import 'package:tag/entity/Constants.dart';
-import 'package:tag/entity/TodoEntity.dart';
+
 import 'package:tag/util/NaigatorUtils.dart';
 import 'package:tag/util/util.dart';
 import 'package:tag/view/widget/view/TextView.dart';
 
 /// 编辑Todo列表的页面
 class EditTodoListRoute extends StatelessWidget {
-  /// 初始化的todo list
-  List<TodoEntity> initTodos;
+  /// 初始化的name list
+  List<Todo> initTodos;
 
-  /// 当前的todo list
-  List<TodoEntity> _todoItemStrs = List();
+  /// 当前的name list
+  List<Todo> _nameItemStrs = List();
 
-  List<EditTodoListItemWidget> _todoItemWidgets = List();
+  List<EditTodoListItemWidget> _nameItemWidgets = List();
 
-  Function todoCallback;
+  Function nameCallback;
 
   FocusNode _focusNode;
 
   Function _focusCallback;
 
-  PublishSubject<List<EditTodoListItemWidget>> _todoItemStream =
+  PublishSubject<List<EditTodoListItemWidget>> _nameItemStream =
       PublishSubject();
 
   @override
@@ -54,34 +55,34 @@ class EditTodoListRoute extends StatelessWidget {
         child: StreamBuilder<List<EditTodoListItemWidget>>(
           initialData:
               ((NavigatorUtils.getPreArguments(context)[Constants.DATA] ?? [])
-                      as List<TodoEntity>)
+                      as List<Todo>)
                   .map((data) => EditTodoListItemWidget(
-                        todoEntity: data,
+                        nameEntity: data,
                         focusCallback: _focusCallback,
                         removeCallback: (item) {
-                          _todoItemWidgets.remove(item);
+                          _nameItemWidgets.remove(item);
                         },
                       ))
                   .toList(),
-          stream: _todoItemStream,
+          stream: _nameItemStream,
           builder: (context, widgets) {
-            /// 记录下来widgets以及对应的todo文本
-            _todoItemWidgets = widgets.data;
-            _todoItemStrs =
-                _todoItemWidgets.map((widget) => widget.getTodoInfo()).toList();
+            /// 记录下来widgets以及对应的name文本
+            _nameItemWidgets = widgets.data;
+            _nameItemStrs =
+                _nameItemWidgets.map((widget) => widget.getTodoInfo()).toList();
             return ReorderableListView(
                 onReorder: (oldInex, newIndex) {
                   /// 改变被移动widget在list中的位置
-                  EditTodoListItemWidget widget = _todoItemWidgets[oldInex];
-                  _todoItemWidgets.remove(widget);
-                  if (newIndex >= _todoItemWidgets.length) {
-                    _todoItemWidgets.add(widget);
+                  EditTodoListItemWidget widget = _nameItemWidgets[oldInex];
+                  _nameItemWidgets.remove(widget);
+                  if (newIndex >= _nameItemWidgets.length) {
+                    _nameItemWidgets.add(widget);
                   } else {
-                    _todoItemWidgets.insert(newIndex, widget);
+                    _nameItemWidgets.insert(newIndex, widget);
                   }
                   buildListItem(getTodos());
                 },
-                children: _todoItemWidgets);
+                children: _nameItemWidgets);
           },
         ),
       ),
@@ -89,53 +90,53 @@ class EditTodoListRoute extends StatelessWidget {
   }
 
   /// 根据文本构建widgets，然后通过stream发射出去更新ui
-  void buildListItem(List<TodoEntity> datas) {
+  void buildListItem(List<Todo> datas) {
     List<EditTodoListItemWidget> widgets = datas
         .map((data) => EditTodoListItemWidget(
-              todoEntity: data,
+              nameEntity: data,
               focusCallback: _focusCallback,
               removeCallback: (item) {
-                _todoItemWidgets.remove(item);
+                _nameItemWidgets.remove(item);
               },
             ))
         .toList();
-    _todoItemStream.add(widgets);
+    _nameItemStream.add(widgets);
   }
 
-  /// 检查todolist的数据有没有变动
+  /// 检查namelist的数据有没有变动
   bool checkTodoDataChange() {
     // 长度或者对应index的内容变动了就要给当前清单的数据重新赋值
-    if (_todoItemWidgets.length != _todoItemStrs.length) {
+    if (_nameItemWidgets.length != _nameItemStrs.length) {
       return true;
     }
-    for (int i = 0; i < _todoItemWidgets.length; i++) {
-      if (_todoItemWidgets[i].todoContent != _todoItemStrs[i]) {
+    for (int i = 0; i < _nameItemWidgets.length; i++) {
+      if (_nameItemWidgets[i].nameContent != _nameItemStrs[i]) {
         return true;
       }
     }
     return false;
   }
 
-  /// 移除掉空的todo
+  /// 移除掉空的name
   void removeEmptyTodo() {
-    if (_todoItemStrs.isEmpty) {
+    if (_nameItemStrs.isEmpty) {
       return;
     }
 
     /// 过滤掉内容为空的itemWidget
-    List<Widget> notEmptyWidgets = _todoItemWidgets
-        .takeWhile((widget) => widget.todoContent.isNotEmpty)
+    List<Widget> notEmptyWidgets = _nameItemWidgets
+        .takeWhile((widget) => widget.nameContent.isNotEmpty)
         .toList();
-    if (notEmptyWidgets.length != _todoItemStrs.length) {
-      _todoItemStream.add(notEmptyWidgets);
+    if (notEmptyWidgets.length != _nameItemStrs.length) {
+      _nameItemStream.add(notEmptyWidgets);
     }
   }
 
   /// 新建一个空的清单输入框
   void addNewItem() {
     /// 过滤掉内容为空的itemWidget
-    List<EditTodoListItemWidget> notEmptyWidgets = _todoItemWidgets
-        .takeWhile((widget) => widget.todoContent.isNotEmpty)
+    List<EditTodoListItemWidget> notEmptyWidgets = _nameItemWidgets
+        .takeWhile((widget) => widget.nameContent.isNotEmpty)
         .toList();
 
     /// 去除焦点
@@ -143,56 +144,56 @@ class EditTodoListRoute extends StatelessWidget {
 
     /// 在list尾加入一个有焦点的空输入框
     notEmptyWidgets.add(EditTodoListItemWidget(
-        todoEntity: TodoEntity(),
+        nameEntity: Todo(isFinish: 0, name: ""),
         autoFocus: true,
         focusCallback: _focusCallback,
         removeCallback: (item) {
-          _todoItemWidgets.remove(item);
+          _nameItemWidgets.remove(item);
         }));
-    _todoItemStream.add(notEmptyWidgets);
+    _nameItemStream.add(notEmptyWidgets);
   }
 
-  /// 获取当前的todo列表数据
-  List<TodoEntity> getTodos() {
-    List<TodoEntity> todos = List();
-    _todoItemWidgets.forEach((item) {
+  /// 获取当前的name列表数据
+  List<Todo> getTodos() {
+    List<Todo> names = List();
+    _nameItemWidgets.forEach((item) {
       if (item.getTodoInfo() != null) {
-        todos.add(item.getTodoInfo());
+        names.add(item.getTodoInfo());
       }
     });
-    return todos;
+    return names;
   }
 }
 
-/// todo的
+/// name的
 class EditTodoListItemWidget extends StatelessWidget {
   final Function focusCallback;
-  String todoContent;
+  String nameContent;
   Function removeCallback;
   BuildContext _context;
   FocusNode _node = FocusNode();
   double height = 0;
   bool autoFocus;
-  TodoEntity todoEntity;
+  Todo nameEntity;
 
   EditTodoListItemWidget(
-      {this.todoEntity,
+      {this.nameEntity,
       this.focusCallback,
       this.removeCallback,
       this.autoFocus = false})
       : super(key: UniqueKey()) {
-    todoContent = todoEntity?.todo ?? '';
+    nameContent = nameEntity?.name ?? '';
   }
 
-  TodoEntity getTodoInfo() {
-    todoEntity.todo = todoContent;
-    return todoEntity;
+  Todo getTodoInfo() {
+    nameEntity.name = nameContent;
+    return nameEntity;
   }
 
   @override
   Widget build(BuildContext context) {
     _context = context;
-    return buildTodoItem(todoContent);
+    return buildTodoItem(nameContent);
   }
 
   TextEditingController controller;
@@ -206,7 +207,7 @@ class EditTodoListItemWidget extends StatelessWidget {
 
   Widget buildTodoItem(String value) {
     controller = TextEditingController.fromValue(
-        TextEditingValue(text: getTodoInfo()?.todo ?? ""));
+        TextEditingValue(text: getTodoInfo()?.name ?? ""));
     return Dismissible(
       key: UniqueKey(),
       onDismissed: (_) {
@@ -275,7 +276,7 @@ class EditTodoListItemWidget extends StatelessWidget {
                     controller: controller,
                     textInputAction: TextInputAction.done,
                     onChanged: (value) {
-                      todoContent = value;
+                      nameContent = value;
                     },
                     onSubmitted: (_) {
                       _node.unfocus();

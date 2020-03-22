@@ -115,7 +115,7 @@ class NavigatorUtils {
   }
 
   Future<Object> toEditTodoList(BuildContext context,
-      {List<TodoEntity> todos}) {
+      {List<Todo> todos}) {
     HashMap<String, dynamic> hashMap = HashMap();
     hashMap.putIfAbsent(Constants.DATA, () {
       return todos;

@@ -34,7 +34,7 @@ class BuildFlagBloc extends BlocBase {
     if (_initInfo == null && info != null) {
       _initInfo = info;
       _flagTitle = info.flagName;
-      selectDate(info.date);
+      selectDate(DateTime.fromMicrosecondsSinceEpoch(info.dateInt));
       addCategoryItem(info.categories);
     }
   }
@@ -67,12 +67,12 @@ class BuildFlagBloc extends BlocBase {
 
   BuildFlagInfo buildFlagInfo() {
     return BuildFlagInfo(
-        date: getSelectDate(),
+        dateInt: getSelectDate().millisecondsSinceEpoch,
         flagName: getTitle(),
         categories: _addCategoryTags.toList(),
         backgroundType: _initInfo?.backgroundType ?? BackgroundType.COLOR,
         backgroundImage: _initInfo?.backgroundImage,
-        colorStr: _initInfo?.colorStr ?? Constants.MAIN_COLOR);
+        backgroundColor: _initInfo?.backgroundColor ?? Constants.MAIN_COLOR);
   }
 
   String getTitle() => _flagTitle;

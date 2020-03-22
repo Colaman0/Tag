@@ -101,7 +101,7 @@ class _FlagListWidgetState extends State<FlagListWidget> {
                                   ),
                                   Expanded(
                                       child: TextView(
-                                    '${info.flagName}${info.date.difference(DateTime.now()).inDays >= 0 ? "已经" : "还有"}',
+                                    '${info.flagName}${info.getDate().difference(DateTime.now()).inDays >= 0 ? "已经" : "还有"}',
                                     textSize: 30,
                                     textColor: Colors.black,
                                   )
@@ -112,7 +112,7 @@ class _FlagListWidgetState extends State<FlagListWidget> {
                               ),
                             ),
                             View(
-                              child: buildDayText(info.date
+                              child: buildDayText(info.getDate()
                                   .difference(DateTime.now())
                                   .inDays
                                   .abs()
@@ -191,7 +191,7 @@ class _FlagListWidgetState extends State<FlagListWidget> {
             Icon(Icons.calendar_today,
                 color: Colors.white, size: DP.toDouble(24)),
             TextView(
-              "${info.date.year}.${info.date.month}.${info.date.day}",
+              "${info.getDate().year}.${info.getDate().month}.${info.getDate().day}",
               textSize: 26,
               textColor: Colors.black,
             ).margin(left: 12)

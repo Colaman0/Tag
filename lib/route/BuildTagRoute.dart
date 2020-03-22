@@ -6,12 +6,13 @@ import 'package:tag/base/bloc.dart';
 import 'package:tag/bloc/BuildTagBloc.dart';
 import 'package:tag/entity/BuildTagInfo.dart';
 import 'package:tag/entity/Constants.dart';
-import 'package:tag/entity/TodoEntity.dart';
+import 'package:tag/util/DataProvider.dart';
 import 'package:tag/util/NaigatorUtils.dart';
 import 'package:tag/util/util.dart';
 import 'package:tag/view/tag/SearchCategoryRoute.dart';
 import 'package:tag/view/widget/CalendarWidget.dart';
 import 'package:tag/view/widget/CategroyItemWidget.dart';
+import 'package:tag/view/widget/LoadingDialog.dart';
 import 'package:tag/view/widget/TimeSelectWidget.dart';
 import 'package:tag/view/widget/view/TextView.dart';
 import 'package:tag/view/widget/view/View.dart';
@@ -141,7 +142,7 @@ class BuildTagRoute extends StatelessWidget {
   /// 获取清单列表的UI
   Widget getTodoListItem() {
     return View(
-        child: StreamBuilder<List<TodoEntity>>(
+        child: StreamBuilder<List<Todo>>(
             initialData: _tagBloc.getTodoList(),
             stream: _tagBloc.getTodoListStream(),
             builder: (context, data) {
@@ -178,7 +179,7 @@ class BuildTagRoute extends StatelessWidget {
                         .margin(top: 10, right: 18),
                     Expanded(
                       child: TextView(
-                        todoContent.todo ?? "",
+                        todoContent.name ?? "",
                         textSize: 24,
                       ).aligment(Alignment.centerLeft),
                     )
@@ -362,74 +363,35 @@ class BuildTagRoute extends StatelessWidget {
           if (_tagBloc.getTagName() == null || _tagBloc.getTagName().isEmpty) {
             Fluttertoast.showToast(msg: "标题不能为空");
           } else {
+            showDialog(context: context, child: MyCustomLoadingDialog());
             if (_tagBloc.isInit) {
-              Navigator.of(context).pop(_tagBloc.getTagInfo());
-              return;
+              _tagBloc.updateTag((result) {
+                Navigator.of(context).pop();
+                if (result) {
+                  Fluttertoast.showToast(msg: "保存成功");
+                  Navigator.of(context).pop(_tagBloc.getTagInfo());
+                } else {
+                  Fluttertoast.showToast(msg: "保存失败");
+                }
+              });
+            } else {
+              _tagBloc.addNewTag((result, value) {
+                Navigator.of(context).pop();
+                if (result) {
+                  _tagBloc.getTagInfo().objectId = value;
+                  DataProvider.getInstance().addNewTagToStream(_tagBloc.getTagInfo());
+                  Fluttertoast.showToast(msg: "创建成功");
+                  Navigator.of(context).pop();
+                  NavigatorUtils.getInstance()
+                      .toTagRoute(context, _tagBloc.getTagInfo());
+                } else {
+                  Fluttertoast.showToast(msg: "创建失败");
+                }
+              });
             }
-            Navigator.of(context).pop();
-            NavigatorUtils.getInstance()
-                .toTagRoute(context, _tagBloc.getTagInfo());
           }
         },
       ),
     );
-  }
-
-  /// 获取分类的widget，点击跳转搜索添加分类标签
-  Widget getCategoryItem() {
-    return StreamBuilder<List<String>>(
-        stream: _tagBloc.getTagsStream(),
-        builder: (context, data) {
-          ///  把标签list转换成对应的chip控件显示
-          List<Widget> children;
-          if (data.data != null) {
-            children = data.data
-                .map((tagName) => CategoryItemWidget(
-                      clickAble: true,
-                      removeAble: true,
-                      name: tagName,
-                      removeCallback: (name) =>
-                          _tagBloc.removeCategoryItem(name),
-                    ))
-                .toList();
-          }
-          return Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                View(
-                  child: Row(children: <Widget>[
-                    TextView(
-                      "标签 (最多三个)",
-                      textSize: 24,
-                      textColor: Colors.grey,
-                    ).aligment(Alignment.centerLeft),
-                    Spacer(),
-                    Icon(Icons.add)
-                  ]),
-                ).padding(top: 12, bottom: 12).click(() {
-                  int maxSize = 3 - (children?.length ?? 0);
-                  if (maxSize == 0) {
-                    return;
-                  }
-                  showSearch(
-                          context: _context, delegate: CategorySearch(maxSize))
-                      .then((results) {
-                    if (results is Iterable && results.isNotEmpty) {
-                      List<String> tags = [];
-                      results.forEach((tag) {
-                        tags.add(tag);
-                      });
-                      _tagBloc.addCategoryItem(tags);
-                    }
-                  });
-                }),
-                Wrap(
-                  runAlignment: WrapAlignment.start,
-                  children: children ?? [],
-                  spacing: DP.toDouble(16),
-                ),
-              ]);
-        });
   }
 }

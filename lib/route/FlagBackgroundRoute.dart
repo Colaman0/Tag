@@ -1,12 +1,9 @@
-import 'dart:io';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:tag/entity/BuildFlagInfo.dart';
 import 'package:tag/entity/BuildFlagInfo.dart';
 import 'package:tag/entity/Constants.dart';
 import 'package:tag/util/NaigatorUtils.dart';
@@ -101,7 +98,7 @@ class FlagBackgroundRoute extends StatelessWidget {
               width: DP.toDouble(8),
             ),
             Text(
-              "${info.date.year}年${info.date.month}月${info.date.day}日${info.date.hour}时${info.date.minute}分",
+              "${info.getDate().year}年${info.getDate().month}月${info.getDate().day}日${info.getDate().hour}时${info.getDate().minute}分",
               style: new TextStyle(
                 fontSize: 20.0,
                 color: Colors.white,
@@ -114,7 +111,7 @@ class FlagBackgroundRoute extends StatelessWidget {
 
   Widget getFlagTitle() {
     String title = "距离${info.flagName}"
-        "${DateTime.now().isAfter(info.date) ? "已经" : "还有"}";
+        "${DateTime.now().isAfter(info.getDate()) ? "已经" : "还有"}";
 
     return Positioned(
         left: 0,
@@ -151,7 +148,7 @@ class FlagBackgroundRoute extends StatelessWidget {
                   baseline: DP.toDouble(28),
                   baselineType: TextBaseline.alphabetic,
                   child: new Text(
-                    "${nowTime.difference(info.date).inDays.abs()}",
+                    "${nowTime.difference(info.getDate()).inDays.abs()}",
                     style: GoogleFonts.roboto(
                         textStyle: TextStyle(
                       fontSize: 100.0,
@@ -178,8 +175,7 @@ class FlagBackgroundRoute extends StatelessWidget {
           onTap: () {
             ImagePicker.pickImage(source: ImageSource.gallery).then((image) {
               if (image != null) {
-                info.backgroundType = BackgroundType.IMAGE;
-                info.backgroundImage = image;
+                info.setImage(image);
                 backgroundStream.add(info);
               }
             });
@@ -225,10 +221,9 @@ class FlagBackgroundRoute extends StatelessWidget {
                                 .click(() {
                               Navigator.of(context).pop();
                               ImagePicker.pickImage(source: ImageSource.camera)
-                                  .then((file) {
-                                if (file != null) {
-                                  info.backgroundType = BackgroundType.IMAGE;
-                                  info.backgroundImage = file;
+                                  .then((image) {
+                                if (image != null) {
+                                  info.setImage(image);
                                   backgroundStream.add(info);
                                 }
                               });
@@ -240,10 +235,9 @@ class FlagBackgroundRoute extends StatelessWidget {
                             ).size(height: 64, width: View.MATCH).click(() {
                               Navigator.of(context).pop();
                               ImagePicker.pickImage(source: ImageSource.gallery)
-                                  .then((file) {
-                                if (file != null) {
-                                  info.backgroundType = BackgroundType.IMAGE;
-                                  info.backgroundImage = file;
+                                  .then((image) {
+                                if (image != null) {
+                                  info.setImage(image);
                                   backgroundStream.add(info);
                                 }
                               });
@@ -283,8 +277,7 @@ class FlagBackgroundRoute extends StatelessWidget {
         height: DP.toDouble(58),
       ),
       onTap: () {
-        info.backgroundType = BackgroundType.COLOR;
-        info.colorStr = color;
+        info.setColor(color);
         backgroundStream.add(info);
       },
     );
@@ -295,7 +288,7 @@ List<Widget> getFlagContentWidgets(BuildFlagInfo info,
     {PublishSubject<BuildFlagInfo> backgroundStream}) {
   DateTime nowTime = DateTime.now();
   String title = "距离${info.flagName}"
-      "${DateTime.now().isAfter(info.date) ? "已经" : "还有"}";
+      "${DateTime.now().isAfter(info.getDate()) ? "已经" : "还有"}";
   Widget background;
   if (backgroundStream != null) {
     background = Positioned(
@@ -312,7 +305,7 @@ List<Widget> getFlagContentWidgets(BuildFlagInfo info,
               data.data.backgroundImage != null) {
             return SizedBox(
               child: Image.file(
-                data.data.backgroundImage,
+                data.data.backgroundFile,
                 fit: BoxFit.fitHeight,
               ),
               width: double.infinity,
@@ -320,7 +313,7 @@ List<Widget> getFlagContentWidgets(BuildFlagInfo info,
             );
           } else {
             return Container(
-              color: HexColor(data.data.colorStr) ?? Colors.black12,
+              color: HexColor(data.data.backgroundColor) ?? Colors.black12,
               width: double.infinity,
               height: double.infinity,
             );
@@ -332,13 +325,13 @@ List<Widget> getFlagContentWidgets(BuildFlagInfo info,
     background = Positioned(
         child: info.backgroundImage == null
             ? Container(
-                color: HexColor(info.colorStr ?? "#80000000"),
+                color: HexColor(info.backgroundColor ?? "#80000000"),
                 width: double.infinity,
                 height: double.infinity,
               )
             : SizedBox(
                 child: Image.file(
-                  info.backgroundImage,
+                  info.backgroundFile,
                   fit: BoxFit.fitHeight,
                 ),
                 width: double.infinity,
@@ -358,7 +351,7 @@ List<Widget> getFlagContentWidgets(BuildFlagInfo info,
             baseline: DP.toDouble(28),
             baselineType: TextBaseline.alphabetic,
             child: new Text(
-              "${nowTime.difference(info.date).inDays.abs()}",
+              "${nowTime.difference(info.getDate()).inDays.abs()}",
               style: GoogleFonts.roboto(
                   textStyle: TextStyle(
                 fontSize: 100.0,
@@ -412,7 +405,7 @@ List<Widget> getFlagContentWidgets(BuildFlagInfo info,
               width: DP.toDouble(8),
             ),
             Text(
-              "${info.date.year}年${info.date.month}月${info.date.day}日${info.date.hour}时${info.date.minute}分",
+              "${info.getDate().year}年${info.getDate().month}月${info.getDate().day}日${info.getDate().hour}时${info.getDate().minute}分",
               style: new TextStyle(
                 fontSize: 20.0,
                 color: Colors.white,

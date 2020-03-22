@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:tag/entity/BuildTagInfo.dart';
 import 'package:tag/entity/Constants.dart';
+import 'package:tag/util/NaigatorUtils.dart';
 import 'package:tag/util/util.dart';
 import 'package:tag/view/widget/view/TextView.dart';
 import 'package:tag/view/widget/view/View.dart';
@@ -42,16 +43,30 @@ class _TagListWidgetState extends State<TagListWidget> {
                 child: Column(
                   children: childs,
                 ),
-              ).click(() {}).margin(top: 4),
+              ).click(() {
+                NavigatorUtils.getInstance().toTagRoute(context, info);
+              }).margin(top: 4),
             );
           }),
     ).backgroundColorStr("#F5F5F5");
   }
 
-  Widget buildTagTitle(BuildTagInfo info) => TextView(
-        "${info.date.year}.${info.date.month}月${info.date.day}日 - ${info.date.hour}时${info.date.minute}分",
-        textSize: 24,
-        textColor: Colors.white,
+  Widget buildTagTitle(BuildTagInfo info) => View(
+        child: Row(
+          children: <Widget>[
+            TextView(
+              info.tagName,
+              textSize: 28,
+              textColor: Colors.white,
+            ),
+            Spacer(),
+            TextView(
+              "${info.getDate().year}.${info.getDate().month}.${info.getDate().day}  ${info.getDate().hour.toString().padLeft(2, '0')}:${info.getDate().minute.toString().padLeft(2, '0')}",
+              textSize: 24,
+              textColor: Colors.white,
+            )
+          ],
+        ),
       )
           .corner(leftTop: 10, rightTop: 10)
           .padding(both: 16)
@@ -60,7 +75,7 @@ class _TagListWidgetState extends State<TagListWidget> {
 
   List<Widget> buildTodos(BuildTagInfo info) {
     List<Widget> widgets = List();
-    info.todos.forEach((todo) {
+    info.todo.forEach((todo) {
       if (widgets.length >= 3) {
         widgets.add(View(
           child: Icon(Icons.more_vert),
@@ -73,19 +88,19 @@ class _TagListWidgetState extends State<TagListWidget> {
             children: <Widget>[
               Checkbox(
                   materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  value: todo?.isFinish ?? false,
+                  value: todo?.isTodoFinish() ?? false,
                   activeColor: HexColor(Constants.COLOR_3),
                   checkColor: Colors.white),
               Expanded(
                 child: Text(
-                  todo?.todo ?? "",
+                  todo?.name ?? "",
                   style: GoogleFonts.rubik(
                       textStyle: TextStyle(
-                    color: todo?.isFinish ?? false
+                    color: todo?.isTodoFinish() ?? false
                         ? HexColor(Constants.COLOR_3)
                         : Colors.black,
                     fontSize: SP.get(24),
-                    decoration: todo?.isFinish ?? false
+                    decoration: todo?.isTodoFinish() ?? false
                         ? TextDecoration.lineThrough
                         : TextDecoration.none,
                     decorationColor: Colors.grey,
