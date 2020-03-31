@@ -1,5 +1,10 @@
+import 'dart:collection';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:tag/bloc/BuildTagBloc.dart';
+import 'package:tag/util/util.dart';
 import 'package:tag/view/widget/view/TextView.dart';
 import 'package:tag/view/widget/view/View.dart';
 
@@ -16,9 +21,12 @@ class TimeSelectView extends StatelessWidget {
 
   PublishSubject<int> hourItemStream = PublishSubject();
   PublishSubject<int> minItemStream = PublishSubject();
+  Function selectTimeFun ;
 
-  TimeSelectView({Key key, this.dateTime}) : super(key: key) {
-    for (int i = 1; i < 24; i++) {
+  int selectHour, selectMin;
+
+  TimeSelectView({Key key, this.dateTime,this.selectTimeFun }) : super(key: key) {
+    for (int i = 0; i < 24; i++) {
       hours.add(i);
     }
     for (int i = 0; i < 60; i++) {
@@ -26,33 +34,68 @@ class TimeSelectView extends StatelessWidget {
     }
 
     _hourController =
-        FixedExtentScrollController(initialItem: dateTime.hour - 1);
+        FixedExtentScrollController(initialItem: dateTime.hour );
     _minController = FixedExtentScrollController(initialItem: dateTime.minute);
   }
+
+  int getSelectHour() => selectHour;
+
+  int getSelectMin() => selectMin;
 
   @override
   Widget build(BuildContext context) {
     return View(
-      child: Row(
+      child: Column(
         children: <Widget>[
-          Expanded(
-            child: getHours(),
+          SizedBox(
+            width: double.infinity,
+            child: Row(mainAxisSize: MainAxisSize.min, children: <Widget>[
+              TextView(
+                "取消",
+                textSize: 22,
+                textColor: Colors.white,
+              ).padding(top: 12, bottom: 12, left: 24, right: 24).click(() {
+                Navigator.of(context).pop();
+              }),
+              Spacer(),
+              TextView(
+                "确定",
+                textSize: 22,
+                textColor: Colors.white,
+              ).padding(top: 12, bottom: 12, left: 24, right: 24).click(() {
+                selectTimeFun(DateTime(dateTime.year, dateTime.month,
+                    dateTime.day, getSelectHour(), getSelectMin()));
+                Navigator.of(context).pop();
+              }),
+            ]),
           ),
-          TextView(
-            ":",
-            textSize: 50,
-            textColor: Colors.white,
+          Container(
+            color: Colors.white,
+            height: 0.1,
+            margin: EdgeInsets.only(bottom: DP.toDouble(8)),
           ),
           Expanded(
-            child: getMins(),
-          )
+              child: Row(
+            children: <Widget>[
+              Expanded(
+                child: getHours(),
+              ),
+              TextView(
+                ":",
+                textSize: 50,
+                textColor: Colors.white,
+              ),
+              Expanded(
+                child: getMins(),
+              )
+            ],
+          ))
         ],
       ),
     )
-        .margin(both: 16)
-        .corner(both: 8)
-        .backgroundColorStr("#3282b8")
-        .size(width: View.MATCH, height: 120);
+        .padding(bottom: 32)
+        .backgroundColorStr("#13547a")
+        .size(width: View.MATCH, height: 220);
   }
 
   Widget getHours() => ListWheelScrollView.useDelegate(
@@ -63,15 +106,17 @@ class TimeSelectView extends StatelessWidget {
         childDelegate: ListWheelChildListDelegate(
           children: hours.map((value) {
             return StreamBuilder<int>(
-              initialData: dateTime.hour-1,
-              stream: hourItemStream,
-              builder: (context, data) => TextView(
-                value.toString().padLeft(2, '0'),
-                textSize: (value - 1) == data.data ? 35 : 25,
-                textColor:
-                    (value - 1) == data.data ? Colors.white : Colors.white70,
-              ),
-            );
+                initialData: dateTime.hour ,
+                stream: hourItemStream,
+                builder: (context, data) {
+                  selectHour = data.data;
+                  return TextView(
+                    value.toString().padLeft(2, '0'),
+                    textSize: (value) == data.data ? 35 : 25,
+                    textColor:
+                        (value) == data.data ? Colors.white : Colors.white70,
+                  );
+                });
           }).toList(),
         ),
       );
@@ -84,14 +129,17 @@ class TimeSelectView extends StatelessWidget {
         childDelegate: ListWheelChildListDelegate(
           children: mins.map((value) {
             return StreamBuilder<int>(
-              initialData: dateTime.minute,
-              stream: minItemStream,
-              builder: (context, data) => TextView(
-                value.toString().padLeft(2, '0'),
-                textSize: value == data.data ? 35 : 25,
-                textColor: value == data.data ? Colors.white : Colors.white70,
-              ),
-            );
+                initialData: dateTime.minute,
+                stream: minItemStream,
+                builder: (context, data) {
+                  selectMin = data.data;
+                  return TextView(
+                    value.toString().padLeft(2, '0'),
+                    textSize: value == data.data ? 35 : 25,
+                    textColor:
+                        value == data.data ? Colors.white : Colors.white70,
+                  );
+                });
           }).toList(),
         ),
       );

@@ -23,7 +23,7 @@ class BuildLineWidget extends StatelessWidget {
         child: Column(
           children: <Widget>[
             Container(
-              margin: EdgeInsets.only(top: DP.get(4),bottom: DP.get(8)),
+              margin: EdgeInsets.only(top: DP.toDouble(4),bottom: DP.toDouble(8)),
               child: Row(
                 children: titles,
               ),
@@ -37,7 +37,7 @@ class BuildLineWidget extends StatelessWidget {
             )
           ],
         ),
-        padding: EdgeInsets.only(top: DP.get(8), bottom: DP.get(8)),
+        padding: EdgeInsets.only(top: DP.toDouble(8), bottom: DP.toDouble(8)),
       );
     });
   }

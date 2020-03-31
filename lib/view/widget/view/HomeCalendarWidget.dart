@@ -1,5 +1,4 @@
 import 'dart:collection';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_custom_calendar/flutter_custom_calendar.dart';
@@ -11,13 +10,18 @@ import 'package:tag/util/util.dart';
 import 'package:tag/view/widget/view/TextView.dart';
 import 'package:tag/view/widget/view/View.dart';
 
-class CalendarWidget extends StatelessWidget {
-  CalendarWidget({Key key, this.time, this.selectCallback}) : super(key: key);
+class HomeCalendarWidget extends StatelessWidget {
+  HomeCalendarWidget({Key key, this.time, this.selectCallback})
+      : super(key: key) {
+    if (time == null) {
+      time = DateTime.now();
+    }
+  }
 
   static final CAN_WATCH_YEAR = 3;
   static final startIndex = CAN_WATCH_YEAR * 12;
   PageController _controller = new PageController(initialPage: startIndex);
-  final DateTime time;
+  DateTime time;
   final Function selectCallback;
   CalendarBloc _bloc;
 
@@ -159,7 +163,7 @@ class _MonthPageState extends State<MonthPage>
     this.nowDateTime,
   ) {
     int year = nowDateTime.year;
-    int different = CalendarWidget.startIndex - index;
+    int different = HomeCalendarWidget.startIndex - index;
 
     // 算出差了多少年
     int yearDifferent = different.abs() ~/ 12;
@@ -290,47 +294,37 @@ class _DateItemState extends State<DateItem> {
 
   @override
   Widget build(BuildContext context) {
-    if (_child == null) {
-      _child = AspectRatio(
-          aspectRatio: 1,
-          child: Container(
-            child: View(
+    return AspectRatio(
+        aspectRatio: 1,
+        child: Stack(
+          alignment: Alignment.center,
+          children: <Widget>[
+            Positioned(
+              right: 0,
+              top: 0,
               child: TextView(
-                "${itemTime.day}",
-                textColor: DateUtil.isWeekend(itemTime)
-                    ? HexColor(_weekendColors)
-                    : HexColor(Constants.MAIN_COLOR),
-                textSize: 20,
-              ).circle(),
-            ).circle().click(() {
-              _bloc.selectDate(itemTime);
-            }),
-          ));
-    }
-    return StreamBuilder<DateTime>(
-      stream: _bloc.getSelectDateStream(),
-      // 默认选中的日期是创建的日期
-      initialData: _bloc.getCreateDate(),
-      builder: (context, data) {
-        if (DateUtil.isSameDay(data.data, itemTime)) {
-          return AspectRatio(
-              aspectRatio: 1,
+                "113",
+                textColor: Colors.white70,
+              ).padding(both: 8).backgroundColor(Colors.teal[300]).circle(),
+            ),
+            Positioned(
               child: Container(
                 child: View(
-                        child: TextView(
-                  "${itemTime.day}",
-                  textColor: Colors.white,
-                  textSize: 26,
-                ))
-                    .circle()
-                    .backgroundColorStr(Constants.MAIN_COLOR)
-                    .click(() {}),
-              ));
-        } else {
-          return _child;
-        }
-      },
-    );
+                  child: TextView(
+                    "${itemTime.day}",
+                    textColor: DateUtil.isWeekend(itemTime)
+                        ? HexColor(_weekendColors)
+                        : HexColor(Constants.MAIN_COLOR),
+                    textSize: 28,
+                  ).circle(),
+                ).circle().click(() {
+                  _bloc.selectDate(itemTime);
+                }),
+              ),
+            ),
+
+          ],
+        ));
   }
 }
 

@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:tag/view/widget/view/View.dart';
 
@@ -11,7 +12,7 @@ import 'package:tag/view/widget/view/View.dart';
 ///
 
 class DP {
-  static double get(int dp) {
+  static double toDouble(int dp) {
     if (dp == null || dp == 0.0 || dp == View.WRAP) {
       return 0.0;
     }
@@ -21,6 +22,15 @@ class DP {
     return ScreenUtil.getInstance().setWidth(dp.toDouble());
   }
 
+  static int toInt(int dp) {
+    if (dp == null || dp == 0.0 || dp == View.WRAP) {
+      return 0;
+    }
+    if (dp == View.MATCH) {
+      return double.infinity.toInt();
+    }
+    return ScreenUtil.getInstance().setWidth(dp.toDouble()).toInt();
+  }
 }
 
 class SP {
@@ -52,11 +62,27 @@ class CustomMP {
 
   EdgeInsets getParams() {
     return EdgeInsets.only(
-        left: getFinalValue(left), right: getFinalValue(right), top: getFinalValue(top), bottom: getFinalValue(bottom));
+        left: getFinalValue(left),
+        right: getFinalValue(right),
+        top: getFinalValue(top),
+        bottom: getFinalValue(bottom));
   }
 
   /// 如果传入的padding = 0 ，则使用默认的padding
   double getFinalValue(int value) {
-    return DP.get((value == null || value == 0) ? this.both : value);
+    return DP.toDouble((value == null || value == 0) ? this.both : value);
   }
 }
+
+bool IsExpansion(
+    String text, BoxConstraints constraints, double fontSize, int maxLine) {
+  TextPainter _textPainter = TextPainter(
+      maxLines: maxLine,
+      text: TextSpan(
+          text: text,
+          style: TextStyle(color: Colors.black, fontSize: fontSize)),
+      textDirection: TextDirection.ltr)
+    ..layout(maxWidth: constraints.maxWidth, minWidth: constraints.minWidth);
+  return _textPainter.didExceedMaxLines;
+}
+
